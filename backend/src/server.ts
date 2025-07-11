@@ -107,7 +107,7 @@ const Table = mongoose.model<ITable>('Table', TableSchema);
 
 // --- FUNÇÃO DE INICIALIZAÇÃO DO MAPA DE MESAS ---
 const NUM_LINHAS = 19;
-const NUM_COLUNAS = 19;
+const NUM_COLUNAS = 9;
 
 const initializeTables = async () => {
     try {
@@ -281,15 +281,17 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
                 else if (table.status === 'selecionada' && table.ownerId === user.idCasa) {
                     // Clicar em mesa "S" (AZUL CLARO)
                     if (table.tipo === 'S') {
+/*
                         if (user.creditos >= 1) { // Transformar em dupla "D"
                             table.tipo = 'D';
                             user.creditos -= 1;
                         } else { // Liberar a mesa
+*/
                             table.status = 'livre';
                             table.tipo = null;
                             table.ownerId = null;
                             user.creditos += 1;
-                        }
+//                        }
                     }
                     // Clicar em mesa "D" (AZUL ESCURO)
                     else if (table.tipo === 'D') {
