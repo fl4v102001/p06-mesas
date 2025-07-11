@@ -36,8 +36,7 @@ interface WebSocketContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 const WebSocketContext = createContext<WebSocketContextType | null>(null);
 
-// --- NOVO COMPONENTE: SvgSpriteLoader ---
-// Este componente carrega o arquivo SVG do template e o injeta no DOM.
+// --- COMPONENTE: SvgSpriteLoader ---
 const SvgSpriteLoader: React.FC<{ url: string }> = ({ url }) => {
     const [svgContent, setSvgContent] = useState<string>('');
 
@@ -57,8 +56,6 @@ const SvgSpriteLoader: React.FC<{ url: string }> = ({ url }) => {
         fetchSvg();
     }, [url]);
 
-    // Usa dangerouslySetInnerHTML para renderizar o conteúdo SVG.
-    // Isso é seguro aqui porque estamos a carregar um arquivo local do nosso próprio projeto.
     return <div dangerouslySetInnerHTML={{ __html: svgContent }} style={{ display: 'none' }} />;
 };
 
@@ -86,7 +83,6 @@ const App: React.FC = () => {
 
     return (
         <AuthContext.Provider value={authContextValue}>
-            {/* Carrega o template SVG para que possa ser usado em toda a aplicação */}
             <SvgSpriteLoader url="/mesa-svg.html" />
             <div style={styles.app}>
                 {token && idCasa ? <MapPage /> : <LoginPage />}
@@ -262,20 +258,23 @@ const TableGrid: React.FC = () => {
 
     if (!wsContext) return <p>A carregar mapa...</p>;
 
-    const baseWidth = 50;
-    const baseHeight = 60;
-
     return (
         <div style={styles.gridContainer}>
             {grid.map((row, rowIndex) => (
-                <div key={rowIndex} 
-                    style={{ ...styles.gridRow, marginTop: `${-18 + rowIndex/2}px`, // CÁLCULO INLINE COM A NOVA FÓRMULA
-                    }}>
+                <div 
+                    key={rowIndex} 
+                    style={{ 
+                        ...styles.gridRow,
+                        marginTop: `${-30 + rowIndex/2}px`,
+                    }}
+                >
                     {row.map((table, colIndex) => {
                         if (table) {
                             return <Table key={table._id} tableData={table} />;
                         } else {
                             // --- CÁLCULO DINÂMICO PARA O PLACEHOLDER ---
+                            const baseWidth = 55;
+                            const baseHeight = 60;
                             const scaleFactor = 1 + (rowIndex * 0.03);
                             const placeholderStyle = {
                                 ...styles.tablePlaceholder,
@@ -292,10 +291,31 @@ const TableGrid: React.FC = () => {
 };
 
 
-// --- COMPONENTE DE MESA INDIVIDUAL (MODIFICADO PARA USAR SVG) ---
+// --- COMPONENTE DE MESA INDIVIDUAL ---
 const Table: React.FC<{ tableData: TableData }> = ({ tableData }) => {
     const auth = useContext(AuthContext);
     const wsContext = useContext(WebSocketContext);
+
+    // --- PASSO 1: DEFINIR VARIÁVEIS DE CONTROLO ---
+    const baseWidth = 55;
+    const baseHeight = 60;
+    const scaleIncrement = 0.03;
+    const svgScale = 0.9; // SVG ocupa 90% da célula
+    const maxOffsetX = 10;
+    const maxOffsetY = 10;
+
+    // --- PASSO 3: GERAR E GUARDAR DESLOCAMENTO ALEATÓRIO ---
+    const randomOffset = useMemo(() => ({
+        x: Math.random() * maxOffsetX,
+        y: Math.random() * maxOffsetY
+    }), []); // O array vazio [] garante que isto só é calculado uma vez
+
+    // --- PASSO 2: CALCULAR TAMANHOS DINÂMICOS ---
+    const scaleFactor = 1 + (tableData.linha * scaleIncrement);
+    const cellWidth = baseWidth * scaleFactor;
+    const cellHeight = baseHeight * scaleFactor;
+    const svgWidth = cellWidth * svgScale;
+    const svgHeight = cellHeight * svgScale;
 
     const handleClick = () => {
         const { status, ownerId } = tableData;
@@ -336,25 +356,30 @@ const Table: React.FC<{ tableData: TableData }> = ({ tableData }) => {
     const isClickable = status === 'livre' || ownerId === auth?.idCasa;
     const tableColor = getTableColor();
 
-    // --- CÁLCULO DINÂMICO DO TAMANHO DA MESA ---
-    const baseWidth = 50; // Largura inicial em pixels
-    const baseHeight = 60; // Altura inicial em pixels
-    const scaleFactor = 1 + (tableData.linha * 0.03); // Fator de incremento de 3% por linha
-
-    const dynamicTableStyle = {
+    // --- PASSO 4: APLICAR ESTILOS DINÂMICOS ---
+    const cellStyle = {
         ...styles.tableContainer,
-        width: `${baseWidth * scaleFactor}px`,
-        height: `${baseHeight * scaleFactor}px`,
+        width: `${cellWidth}px`,
+        height: `${cellHeight}px`,
         cursor: isClickable ? 'pointer' : 'not-allowed',
     };
 
+    const svgStyle = {
+        ...styles.tableSvg,
+        width: `${svgWidth}px`,
+        height: `${svgHeight}px`,
+        position: 'absolute' as 'absolute',
+        top: `${randomOffset.y}px`,
+        left: `${randomOffset.x}px`,
+        fill: tableColor,
+    };
+
     return (
-        <div style={dynamicTableStyle} onClick={handleClick}>
-            <svg style={styles.tableSvg} fill={tableColor} preserveAspectRatio="none">
-                {/* O ID '#mesa-forma' deve corresponder ao ID do symbol no seu template-mesa.html */}
+        <div style={cellStyle} onClick={handleClick}>
+            <svg style={svgStyle} preserveAspectRatio="none">
                 <use href="#mesa-forma" />
             </svg>
-            {tableData.tipo && <span style={styles.tableText}>{tableData.ownerId}</span>} {/* Exibe o ID do dono da mesa */}
+            {tableData.tipo && <span style={styles.tableText}>{tableData.ownerId}</span>}
         </div>
     );
 };
@@ -436,7 +461,7 @@ const styles: { [key: string]: React.CSSProperties } = {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'flex-start', // Alterado de 'center' para 'flex-start' para alinhar a grelha ao topo
+        justifyContent: 'flex-start',
         padding: '20px',
         flexGrow: 1,
         backgroundColor: '#e9ecef',
@@ -444,9 +469,8 @@ const styles: { [key: string]: React.CSSProperties } = {
     },
     gridRow: {
         display: 'flex',
-        alignItems: 'flex-end', // Garante que as mesas se alinhem pela base
+        alignItems: 'flex-end',
     },
-    // Estilos para o novo componente Table com SVG
     tableContainer: {
         position: 'relative',
         margin: '4px',
@@ -456,20 +480,18 @@ const styles: { [key: string]: React.CSSProperties } = {
         userSelect: 'none',
     },
     tableSvg: {
-        width: '100%',
-        height: '100%',
-        stroke: '#333', // Cor da borda do SVG
+        stroke: '#333',
         strokeWidth: '1px',
     },
     tableText: {
         position: 'absolute',
-        top: '40%',    // acerta o texto verticalmente
+        top: '40%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
         fontSize: '14px',
         fontWeight: 'bold',
         color: 'black',
-        pointerEvents: 'none', // Garante que o texto não interfere no clique
+        pointerEvents: 'none',
     },
     tablePlaceholder: {
         margin: '4px',
