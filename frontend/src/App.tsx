@@ -1,5 +1,9 @@
 import React, { useState, useEffect, useContext, createContext, useMemo } from 'react';
 
+// npm start para iniciar o servidor React
+// Certifique-se de que o backend está a ser executado antes de iniciar o frontend.
+
+
 // --- CONFIGURAÇÃO ---
 // Altere estes valores se o seu backend estiver a ser executado num endereço ou porta diferente.
 const API_URL = 'http://localhost:8080';
