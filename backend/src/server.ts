@@ -153,7 +153,7 @@ app.post('/api/auth/register', async (req: Request, res: Response) => {
             idCasa,
             email,
             senha: hashedPassword,
-            creditos: 2 // Usuários começam com 2 créditos
+            creditos: 2, // Usuários começam com 2 créditos
         });
 
         await newUser.save();

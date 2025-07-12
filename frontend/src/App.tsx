@@ -229,6 +229,7 @@ const Header: React.FC = () => {
             <div style={styles.userInfo}>
                 <span>ID-Casa: <strong>{auth?.idCasa}</strong></span>
                 <span>Créditos: <strong>{wsContext?.userCredits}</strong></span>
+                <button style={styles.buyButton}>Comprar</button>
                 <button onClick={auth?.logout} style={styles.logoutButton}>Logout</button>
             </div>
         </header>
@@ -448,6 +449,14 @@ const styles: { [key: string]: React.CSSProperties } = {
         display: 'flex',
         alignItems: 'center',
         gap: '20px',
+    },
+    buyButton: {
+        padding: '8px 12px',
+        backgroundColor: '#007bff',
+        color: 'white',
+        border: 'none',
+        borderRadius: '4px',
+        cursor: 'pointer',
     },
     logoutButton: {
         padding: '8px 12px',
