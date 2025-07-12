@@ -1,6 +1,5 @@
 /.DS_Store
 /.env
-/readme.md
 /resposta-gemini.md
 /backend/.env
 /backend/node_modules
@@ -12,3 +11,4 @@
 /frontend/.vscode
 /frontend/.env
 /frontend/.DS_Store
+/instrucoes.md

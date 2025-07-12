@@ -75,7 +75,7 @@ O frontend é uma Single-Page Application (SPA) construída com React, focada em
 2. Instale as dependências:  
    npm install
 
-3. Crie um ficheiro .env na raiz da pasta do backend com o seguinte conteúdo, substituindo pelos seus valores:  
+3. Crie um arquivo .env na raiz da pasta do backend com o seguinte conteúdo, substituindo pelos seus valores:  
    PORT=8080  
    MONGODB\_URI=mongodb://localhost:27017/table-reservation  
    JWT\_SECRET=o\_seu\_segredo\_super\_secreto
