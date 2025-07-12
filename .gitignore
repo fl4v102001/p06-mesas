@@ -6,7 +6,9 @@
 /backend/node_modules
 /backend/dist
 /backend/.vscode
+/backend/.DS_Store
 /frontend/node_modules
 /frontend/dist
 /frontend/.vscode
 /frontend/.env
+/frontend/.DS_Store

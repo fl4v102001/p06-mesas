@@ -14,9 +14,14 @@ interface TableData {
     ownerId: string | null;
 }
 
+interface UserCreditsData {
+    creditos: number;
+    creditos_especiais: number;
+}
+
 interface MapUpdatePayload {
     tables: TableData[];
-    usersCredits: Record<string, number>;
+    usersCredits: Record<string, UserCreditsData>;
 }
 
 interface AuthContextType {
@@ -171,7 +176,7 @@ const LoginPage: React.FC = () => {
 const MapPage: React.FC = () => {
     const auth = useContext(AuthContext);
     const [tables, setTables] = useState<TableData[]>([]);
-    const [usersCredits, setUsersCredits] = useState<Record<string, number>>({});
+    const [usersCredits, setUsersCredits] = useState<Record<string, UserCreditsData>>({});
     const [ws, setWs] = useState<WebSocket | null>(null);
 
     useEffect(() => {
@@ -185,6 +190,7 @@ const MapPage: React.FC = () => {
 
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
+            console.log('Mensagem recebida do WebSocket:', data); // <-- Adicione esta linha
             if (data.type === 'map-update') {
                 const payload: MapUpdatePayload = data.payload;
                 setTables(payload.tables);
@@ -204,7 +210,8 @@ const MapPage: React.FC = () => {
     };
 
     const idCasa = auth?.idCasa;
-    const userCredits = idCasa ? (usersCredits[idCasa] ?? 0) : 0;
+    const creditsData = idCasa ? usersCredits[idCasa] : null;
+    const userCredits = creditsData ? creditsData.creditos + creditsData.creditos_especiais : 0;
 
     const webSocketContextValue = { tables, userCredits, sendMessage };
 
@@ -340,14 +347,14 @@ const Table: React.FC<{ tableData: TableData }> = ({ tableData }) => {
             if (ownerId === currentUserIdCasa) {
                 return tipo === 'S' ? '#ADD8E6' : '#00008B'; // Azul Claro / Azul Escuro
             } else {
-                return tipo === 'S' ? '#FFFFE0' : '#FFD700'; // Amarelo Claro / Amarelo Escuro
+                return tipo === 'S' ? '#fafa8bff' : '#FFD700'; // Amarelo Claro / Amarelo Escuro
             }
         }
         if (status === 'comprada') {
             if (ownerId === currentUserIdCasa) {
-                return tipo === 'S' ? '#90EE90' : '#006400'; // Verde Claro / Verde Escuro
+                return tipo === 'S' ? '#8cfe8cff' : '#006400'; // Verde Claro / Verde Escuro
             } else {
-                return tipo === 'S' ? '#D3D3D3' : '#A9A9A9'; // Cinza Claro / Cinza Escuro
+                return tipo === 'S' ? '#c1c1c1ff' : '#A9A9A9'; // Cinza Claro / Cinza Escuro
             }
         }
         return '#FFFFFF'; // Branco (livre)
