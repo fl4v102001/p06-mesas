@@ -21,7 +21,7 @@ export const registerUserService = async (userData: RegisterUserDto) => {
         throw new Error('Email ou ID-Casa já existem.');
     }
     const hashedPassword = await bcrypt.hash(senha, 10);
-    const newUser = new User({ nomeCompleto, idCasa, email, senha: hashedPassword, creditos: 2 });
+    const newUser = new User({ nomeCompleto, idCasa, email, senha: hashedPassword, creditos: 2, perfil: 'user', creditos_especiais: 0 });
     await newUser.save();
     return newUser;
 };

@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// Arquivo: src/types/index.ts
+// Arquivo: src/types/index.ts (MODIFICADO)
 // -----------------------------------------------------------------------------
 export interface TableData {
     _id: string;
@@ -20,11 +20,27 @@ export interface MapUpdatePayload {
     usersCredits: Record<string, UserCreditsData>;
 }
 
+// Nova interface para as Configurações
+export interface ISettings {
+    eventName: string;
+    mapRows: number;
+    mapCols: number;
+    priceS: number;
+    priceD: number;
+    placeholders: { linha: number; coluna: number }[];
+    baseWidth: number;
+    baseHeight: number;
+    scaleIncrement: number;
+    svgScale: number;
+    maxOffsetX: number;
+    maxOffsetY: number;
+}
+
 export interface AuthContextType {
     token: string | null;
     idCasa: string | null;
     login: (token: string, idCasa: string) => void;
-    logout: () => void;
+    logout: () => Promise<void>;
 }
 
 export interface WebSocketContextType {
@@ -34,6 +50,10 @@ export interface WebSocketContextType {
     isConnected: boolean;
 }
 
+export interface SettingsContextType {
+    settings: ISettings | null;
+    isLoading: boolean;
+}
 
 export interface RegisterFormData {
     nomeCompleto: string;

@@ -123,6 +123,59 @@ export const styles: { [key: string]: React.CSSProperties } = {
     tablePlaceholder: {
         margin: '4px',
         visibility: 'hidden',
-    }
+    },
+
+        // Estilos para o novo Modal de Confirmação
+    modalOverlay: {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 1000,
+    },
+    modalContent: {
+        backgroundColor: 'white',
+        padding: '25px',
+        borderRadius: '8px',
+        boxShadow: '0 5px 15px rgba(0,0,0,0.3)',
+        width: '90%',
+        maxWidth: '400px',
+        textAlign: 'left',
+    },
+    modalTitle: {
+        marginTop: 0,
+        marginBottom: '10px',
+        fontSize: '1.25rem',
+    },
+    modalMessage: {
+        marginBottom: '20px',
+        fontSize: '1rem',
+        color: '#555',
+    },
+    modalActions: {
+        display: 'flex',
+        justifyContent: 'flex-end',
+        gap: '10px',
+    },
+    modalButton: {
+        padding: '10px 15px',
+        border: 'none',
+        borderRadius: '5px',
+        cursor: 'pointer',
+        fontWeight: 'bold',
+    },
+    modalConfirmButton: {
+        backgroundColor: '#dc3545',
+        color: 'white',
+    },
+    modalCancelButton: {
+        backgroundColor: '#f0f0f0',
+        color: '#333',
+    },
 };
 
