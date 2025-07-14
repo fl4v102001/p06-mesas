@@ -8,6 +8,7 @@ export interface TableData {
     status: 'livre' | 'selecionada' | 'comprada';
     tipo: 'S' | 'D' | null;
     ownerId: string | null;
+    nome?: string; // <-- NOVO Optional field for table name 
 }
 
 export interface UserCreditsData {
@@ -20,7 +21,6 @@ export interface MapUpdatePayload {
     usersCredits: Record<string, UserCreditsData>;
 }
 
-// Nova interface para as Configurações
 export interface ISettings {
     eventName: string;
     mapRows: number;
@@ -34,6 +34,7 @@ export interface ISettings {
     svgScale: number;
     maxOffsetX: number;
     maxOffsetY: number;
+    svgUrl: string;
 }
 
 export interface AuthContextType {
@@ -61,3 +62,4 @@ export interface RegisterFormData {
     email: string;
     senha: string;
 }
+

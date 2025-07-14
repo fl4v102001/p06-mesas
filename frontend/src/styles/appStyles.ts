@@ -115,8 +115,8 @@ export const styles: { [key: string]: React.CSSProperties } = {
 //        left: '50%',
         // top e left serão calculados dinamicamente
         transform: 'translate(-50%, -50%)',
-        fontSize: '14px',
-        fontWeight: 'bold',
+        fontSize: '12px',
+//        fontWeight: 'bold',
         color: 'black',
         pointerEvents: 'none',
     },
@@ -176,6 +176,32 @@ export const styles: { [key: string]: React.CSSProperties } = {
     modalCancelButton: {
         backgroundColor: '#f0f0f0',
         color: '#333',
+    },
+
+    // Estilos para o novo Tooltip
+    tooltipContainer: {
+        position: 'fixed',
+        padding: '8px 12px',
+        backgroundColor: 'white',
+        color: '#333',
+        borderRadius: '6px',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+        zIndex: 1100,
+        pointerEvents: 'none', // Impede que o tooltip intercepte eventos do rato
+        textAlign: 'center',
+    },
+    tooltipTitle: {
+        margin: 0,
+        padding: 0,
+        fontSize: '0.75rem',
+        color: '#666',
+        textTransform: 'uppercase',
+    },
+    tooltipContent: {
+        margin: 0,
+        padding: 0,
+        fontSize: '1rem',
+        fontWeight: 'bold',
     },
 };
 

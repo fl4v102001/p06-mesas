@@ -23,6 +23,8 @@ export interface ISettings extends Document {
     svgScale: number;
     maxOffsetX: number;
     maxOffsetY: number;
+    status: 'ativo' | 'inativo'; // <-- NOVO
+    svgUrl: string;
 }
 
 const PlaceholderSchema: Schema = new Schema({
@@ -31,7 +33,7 @@ const PlaceholderSchema: Schema = new Schema({
 }, { _id: false });
 
 const SettingsSchema: Schema = new Schema({
-    eventName: { type: String, required: true, default: "Evento A" },
+    eventName: { type: String, required: true, default: "Nome do Evento" },
     mapRows: { type: Number, required: true, min: 1, default: 20 },
     mapCols: { type: Number, required: true, min: 1, default: 9 },
     priceS: { type: Number, required: true, min: 0, default: 50.0 },
@@ -49,6 +51,12 @@ const SettingsSchema: Schema = new Schema({
     svgScale: { type: Number, required: true, default: 0.9 },
     maxOffsetX: { type: Number, required: true, default: 10 },
     maxOffsetY: { type: Number, required: true, default: 10 },
+    status: { // <-- NOVO
+        type: String,
+        enum: ['ativo', 'inativo'],
+        default: 'ativo',
+        required: true,
+    },    svgUrl: {type: String, required: true, default: "/mesa-svg.html"},
 });
 
 export const Settings = mongoose.model<ISettings>('Settings', SettingsSchema);

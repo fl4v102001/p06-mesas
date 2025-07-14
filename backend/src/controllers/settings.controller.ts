@@ -8,7 +8,7 @@ import { Settings } from '../models/settings.models';
  */
 export const getSettings = async (req: Request, res: Response) => {
     try {
-        const settings = await Settings.findOne();
+        const settings = await Settings.findOne({ status: 'ativo' });
         if (!settings) {
             // Isto não deve acontecer se a inicialização do servidor funcionar corretamente
             return res.status(404).json({ message: 'Configurações não encontradas.' });

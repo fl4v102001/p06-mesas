@@ -1,15 +1,49 @@
+
 // -----------------------------------------------------------------------------
 // Arquivo: src/services/table.service.ts (MODIFICADO)
 // -----------------------------------------------------------------------------
 import mongoose from 'mongoose';
 import { Table } from '../models/table.model';
 import { User } from '../models/user.model';
-import { ISettings } from '../models/settings.models';
+import { ISettings } from '../models/settings.models'; // <-- CORREÇÃO: Importar do caminho correto
+import { appConfig } from '../config/appConfig';
 
 /**
- * Inicializa o mapa de mesas se estiver vazio, usando as configurações do sistema.
- * @param settings O objeto de configuração carregado da base de dados.
+ * Nomeia todas as mesas que ainda não têm um nome.
+ * O nome é gerado no formato "COLUNA-LINHA" (ex: "A-01", "C-04").
  */
+export const nameEmptyTables = async () => {
+    try {
+        const unnamedTables = await Table.find({ nome: '' });
+
+        if (unnamedTables.length === 0) {
+            console.log("Nenhuma mesa sem nome para atualizar.");
+            return;
+        }
+
+        const bulkOps = unnamedTables.map(table => {
+            // Converte o índice da coluna para uma letra (0 -> A, 1 -> B, ...)
+            const columnName = String.fromCharCode(65 + table.coluna);
+            // Formata o número da linha para ter sempre dois dígitos (1 -> 01, 10 -> 10)
+            const rowName = String(table.linha + 1).padStart(2, '0');
+            const newName = `${columnName}-${rowName}`;
+
+            return {
+                updateOne: {
+                    filter: { _id: table._id },
+                    update: { $set: { nome: newName } }
+                }
+            };
+        });
+
+        const result = await Table.bulkWrite(bulkOps);
+        console.log(`${result.modifiedCount} mesas nomeadas com sucesso.`);
+
+    } catch (error) {
+        console.error("Erro ao nomear as mesas:", error);
+    }
+};
+
 export const initializeTables = async (settings: ISettings) => {
     try {
         const count = await Table.countDocuments();
@@ -22,7 +56,6 @@ export const initializeTables = async (settings: ISettings) => {
 
             for (let i = 0; i < settings.mapRows; i++) {
                 for (let j = 0; j < settings.mapCols; j++) {
-                    // Só cria a mesa se a posição não for um placeholder
                     if (!placeholderSet.has(`${i},${j}`)) {
                         tablesToCreate.push({ linha: i, coluna: j });
                     }
@@ -37,6 +70,7 @@ export const initializeTables = async (settings: ISettings) => {
         console.error('Erro ao inicializar mesas:', error);
     }
 };
+
 
 /**
  * Lida com a lógica de clique em uma mesa, aplicando as novas regras de negócio.
@@ -113,13 +147,13 @@ export const purchaseSelectedTables = async (userId: string, idCasa: string) => 
         }
 
         // 2. Calcular o custo em créditos normais e verificar se há saldo suficiente
-        const creditsCost = selectedTables.length;
-        if (user.creditos < creditsCost) {
-            throw new Error("Créditos insuficientes para realizar a compra.");
-        }
+//        const creditsCost = selectedTables.length;
+//        if (user.creditos < creditsCost) {
+//            throw new Error("Créditos insuficientes para realizar a compra.");
+//        }
 
         // 3. O ganho em créditos especiais é igual ao número de mesas compradas
-        const specialCreditsToGain = selectedTables.length;
+//        const specialCreditsToGain = selectedTables.length;
 
         // 4. Atualizar as mesas para o estado 'comprada'
         const tableIdsToPurchase = selectedTables.map(t => t._id);
@@ -130,16 +164,16 @@ export const purchaseSelectedTables = async (userId: string, idCasa: string) => 
         );
 
         // 5. Atualizar o usuário, subtraindo os créditos normais e adicionando os especiais
-        await User.findByIdAndUpdate(
-            userId,
-            { 
-                $inc: { 
-                    creditos: -creditsCost,
-                    creditos_especiais: specialCreditsToGain 
-                } 
-            },
-            { session }
-        );
+//        await User.findByIdAndUpdate(
+//            userId,
+//            { 
+//                $inc: { 
+//                    creditos: -creditsCost,
+//                    creditos_especiais: specialCreditsToGain 
+//                } 
+//            },
+//            { session }
+//        );
 
         // Se tudo correu bem, comita a transação
         await session.commitTransaction();

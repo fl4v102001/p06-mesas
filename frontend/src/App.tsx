@@ -1,4 +1,3 @@
-
 // -----------------------------------------------------------------------------
 // Arquivo: src/App.tsx (MODIFICADO)
 // -----------------------------------------------------------------------------
@@ -18,17 +17,23 @@ const AppContent: React.FC = () => {
         return <p>Carregando configurações...</p>;
     }
     
-    return auth?.token ? <MapPage /> : <LoginPage />;
+    const svgUrl = settings?.settings?.svgUrl ?? '/mesa-svg.html'; // default URL if not set
+
+    return (
+        <>
+            <SvgSpriteLoader url={svgUrl} />
+            <div style={styles.app}>
+                {auth?.token ? <MapPage /> : <LoginPage />}
+            </div>
+        </>
+    );
 }
 
 const App: React.FC = () => {
     return (
         <AuthProvider>
             <SettingsProvider>
-                <SvgSpriteLoader url="/mesa-svg.html" />
-                <div style={styles.app}>
-                    <AppContent />
-                </div>
+                <AppContent />
             </SettingsProvider>
         </AuthProvider>
     );

@@ -10,6 +10,7 @@ export interface ITable extends Document {
     status: 'livre' | 'selecionada' | 'comprada';
     tipo: 'S' | 'D' | null;
     ownerId: string | null;
+    nome: string; // <-- NOVO
 }
 
 // Schema da Mesa
@@ -19,10 +20,10 @@ const TableSchema: Schema = new Schema<ITable>({
     status: { type: String, enum: ['livre', 'selecionada', 'comprada'], default: 'livre' },
     tipo: { type: String, enum: ['S', 'D', null], default: null },
     ownerId: { type: String, default: null },
+    nome: { type: String, default: '' }, // <-- NOVO
 });
 
-// CORREÇÃO: Cria um índice composto para garantir que cada posição (linha, coluna) seja única.
-// Esta é a forma correta de definir um índice no Mongoose.
 TableSchema.index({ linha: 1, coluna: 1 }, { unique: true });
 
 export const Table = mongoose.model<ITable>('Table', TableSchema);
+
