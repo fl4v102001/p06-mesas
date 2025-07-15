@@ -1,4 +1,3 @@
-
 // -----------------------------------------------------------------------------
 // Arquivo: src/components/TableGrid.tsx (MODIFICADO)
 // -----------------------------------------------------------------------------
@@ -32,8 +31,7 @@ export const TableGrid: React.FC = () => {
             for (let j = 0; j < mapCols; j++) {
                 const key = `${i},${j}`;
                 if (!placeholderSet.has(key)) {
-                    // CORREÇÃO: O objeto de fallback agora é totalmente compatível com TableData
-                    newGrid[i][j] = tablesMap.get(key) || { _id: key, linha: i, coluna: j, status: 'livre', tipo: null, ownerId: null, nome: '' };
+                    newGrid[i][j] = tablesMap.get(key) || { _id: key, linha: i, coluna: j, status: 'livre', tipo: null, ownerId: null };
                 }
             }
         }
@@ -44,28 +42,31 @@ export const TableGrid: React.FC = () => {
 
     return (
         <div style={styles.gridContainer}>
-            {grid.map((row, rowIndex) => (
-                <div key={rowIndex} style={{ ...styles.gridRow, marginTop: `${-30 + rowIndex / 2}px` }}>
-                    {row.map((table, colIndex) => {
-                        if (table) {
-                            return <Table 
-                                key={table._id} 
-                                tableData={table} 
-                                baseWidth={baseWidth}
-                                baseHeight={baseHeight}
-                                scaleIncrement={scaleIncrement}
-                                svgScale={svgScale}
-                                maxOffsetX={maxOffsetX}
-                                maxOffsetY={maxOffsetY}
-                            />;
-                        }
-                        
-                        const scaleFactor = 1 + (rowIndex * scaleIncrement);
-                        const placeholderStyle = { ...styles.tablePlaceholder, width: `${baseWidth * scaleFactor}px`, height: `${baseHeight * scaleFactor}px` };
-                        return <div key={`${rowIndex}-${colIndex}`} style={placeholderStyle}></div>;
-                    })}
-                </div>
-            ))}
+            <div style={styles.gridContentWrapper}>
+                {grid.map((row, rowIndex) => (
+                    <div key={rowIndex} style={styles.gridRow}>
+                        {row.map((table, colIndex) => {
+                            if (table) {
+                                return <Table 
+                                    key={table._id} 
+                                    tableData={table} 
+                                    baseWidth={baseWidth}
+                                    baseHeight={baseHeight}
+                                    scaleIncrement={scaleIncrement}
+                                    svgScale={svgScale}
+                                    maxOffsetX={maxOffsetX}
+                                    maxOffsetY={maxOffsetY}
+                                />;
+                            }
+                            
+                            const scaleFactor = 1 + (rowIndex * scaleIncrement);
+                            const placeholderStyle = { ...styles.tablePlaceholder, width: `${baseWidth * scaleFactor}px`, height: `${baseHeight * scaleFactor}px` };
+                            return <div key={`${rowIndex}-${colIndex}`} style={placeholderStyle}></div>;
+                        })}
+                    </div>
+                ))}
+            </div>
         </div>
     );
 };
+

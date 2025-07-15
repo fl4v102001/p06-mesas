@@ -146,15 +146,6 @@ export const purchaseSelectedTables = async (userId: string, idCasa: string) => 
             throw new Error("Usuário não encontrado.");
         }
 
-        // 2. Calcular o custo em créditos normais e verificar se há saldo suficiente
-//        const creditsCost = selectedTables.length;
-//        if (user.creditos < creditsCost) {
-//            throw new Error("Créditos insuficientes para realizar a compra.");
-//        }
-
-        // 3. O ganho em créditos especiais é igual ao número de mesas compradas
-//        const specialCreditsToGain = selectedTables.length;
-
         // 4. Atualizar as mesas para o estado 'comprada'
         const tableIdsToPurchase = selectedTables.map(t => t._id);
         await Table.updateMany(
@@ -162,18 +153,6 @@ export const purchaseSelectedTables = async (userId: string, idCasa: string) => 
             { $set: { status: 'comprada' } },
             { session }
         );
-
-        // 5. Atualizar o usuário, subtraindo os créditos normais e adicionando os especiais
-//        await User.findByIdAndUpdate(
-//            userId,
-//            { 
-//                $inc: { 
-//                    creditos: -creditsCost,
-//                    creditos_especiais: specialCreditsToGain 
-//                } 
-//            },
-//            { session }
-//        );
 
         // Se tudo correu bem, comita a transação
         await session.commitTransaction();

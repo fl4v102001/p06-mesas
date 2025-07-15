@@ -56,16 +56,35 @@ export const styles: { [key: string]: React.CSSProperties } = {
     },
     header: {
         display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        flexDirection: 'column', // Organiza o título e a barra de informações em coluna
         padding: '10px 20px',
         backgroundColor: '#333',
         color: 'white',
+    },
+    headerTitle: {
+        textAlign: 'center',
+        width: '100%',
+        marginBottom: '10px',
+        fontSize: '1.25rem',
+    },
+    userInfoBar: { // Nova barra para as informações e ações
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
     },
     userInfo: {
         display: 'flex',
         alignItems: 'center',
         gap: '20px',
+    },
+    configButton: {
+        padding: '8px 12px',
+        backgroundColor: '#08aa33ff',
+        color: 'white',
+        border: 'none',
+        borderRadius: '4px',
+        cursor: 'pointer',
     },
     buyButton: {
         padding: '8px 12px',
@@ -74,6 +93,7 @@ export const styles: { [key: string]: React.CSSProperties } = {
         border: 'none',
         borderRadius: '4px',
         cursor: 'pointer',
+        marginLeft: '10px',
     },
     logoutButton: {
         padding: '8px 12px',
@@ -82,29 +102,37 @@ export const styles: { [key: string]: React.CSSProperties } = {
         border: 'none',
         borderRadius: '4px',
         cursor: 'pointer',
+        marginLeft: '10px',
     },
     gridContainer: {
         display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
+        justifyContent: 'flex-start', // Alinha o wrapper interno no topo
         padding: '20px',
         flexGrow: 1,
         backgroundColor: '#e9ecef',
-        overflow: 'auto',
+        overflow: 'auto', // Permite rolagem em ambas as direções
     },
-    gridRow: {
+    gridContentWrapper: { // O novo wrapper para o conteúdo do grid
         display: 'flex',
-        alignItems: 'flex-end',
+        flexDirection: 'column',
+        alignItems: 'center', // Centra as filas de mesas
+        margin: 'auto', // Ajuda a centrar o wrapper se for menor que o container
     },
-    tableContainer: {
-        position: 'relative',
-        margin: '4px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        userSelect: 'none',
+    gridRow: { 
+        display: 'flex', 
+        alignItems: 'flex-end', 
+        justifyContent: 'center' 
     },
+    
+    tableContainer: { 
+        position: 'relative', 
+        margin: '2px', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        userSelect: 'none' 
+    },
+
     tableSvg: {
         stroke: '#333',
         strokeWidth: '1px',

@@ -1,4 +1,3 @@
-
 // -----------------------------------------------------------------------------
 // Arquivo: src/components/Header.tsx (MODIFICADO)
 // -----------------------------------------------------------------------------
@@ -10,7 +9,7 @@ import { styles } from '../styles/appStyles';
 
 interface HeaderProps {
     onLogoutClick: () => void;
-    onBuyClick: () => void; // Nova prop para o botão de comprar
+    onBuyClick: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ onLogoutClick, onBuyClick }) => {
@@ -20,14 +19,18 @@ export const Header: React.FC<HeaderProps> = ({ onLogoutClick, onBuyClick }) => 
 
     return (
         <header style={styles.header}>
-            <h1>{settingsContext?.settings?.eventName || 'Mapa de Mesas'}</h1>
-            <div style={styles.userInfo}>
-                <span>ID-Casa: <strong>{auth?.idCasa}</strong></span>
-                <span>Créditos: <strong>{wsContext?.userCredits ?? '...'}</strong></span>
-                <button onClick={onBuyClick} style={styles.buyButton}>Comprar</button>
-                <button onClick={onLogoutClick} style={styles.logoutButton}>Logout</button>
+            <h1 style={styles.headerTitle}>{settingsContext?.settings?.eventName || 'Mapa de Mesas'}</h1>
+            <div style={styles.userInfoBar}>
+                <div style={styles.userInfo}>
+                    <span>ID-Casa: <strong>{auth?.idCasa}</strong></span>
+                    <span>Créditos: <strong>{wsContext?.userCredits ?? '...'}</strong></span>
+                </div>
+                <div style={styles.userActions}>
+                    <button style={styles.configButton} hidden={true}>Config</button>
+                    <button onClick={onBuyClick} style={styles.buyButton}>Comprar</button>
+                    <button onClick={onLogoutClick} style={styles.logoutButton}>Logout</button>
+                </div>
             </div>
         </header>
     );
 };
-
