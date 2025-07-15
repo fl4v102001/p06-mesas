@@ -1,97 +1,97 @@
-# **Sistema de Reserva de Mesas em Tempo Real**
+# Sistema de Reserva de Mesas em Tempo Real
 
-Este é um projeto full-stack que implementa um sistema de seleção de mesas em tempo real, permitindo que múltiplos utilizadores interajam com um mapa partilhado de forma simultânea. A aplicação é construída com React no frontend e Node.js/Express no backend, utilizando WebSockets para a comunicação em tempo real.
+Este é um projeto full-stack que implementa um sistema de reserva de mesas em tempo real. A plataforma permite que múltiplos usuários, logados em suas contas, interajam simultaneamente com um mapa de mesas compartilhado. Todas as ações, como selecionar ou liberar uma mesa, são refletidas instantaneamente para todos os participantes conectados, graças ao uso de WebSockets para a comunicação.
 
-## **Lógica de Negócio**
+A lógica de negócio é centrada em um sistema de créditos, onde os usuários utilizam diferentes tipos de crédito para selecionar e comprar mesas, que podem ser simples ou duplas.
 
-O conceito central da aplicação é um "mapa de mesas" onde os utilizadores podem selecionar e reservar lugares usando um sistema de créditos.
+## Stack Técnico
 
-* **Sistema de Créditos:** Cada utilizador começa com um número pré-definido de créditos. Estes créditos são a "moeda" usada para selecionar mesas no mapa.  
-* **Seleção de Mesas:**  
-  * Clicar numa mesa **livre** (branca) consome um crédito e marca a mesa como **selecionada** para aquele utilizador.  
-  * Clicar novamente na sua própria mesa selecionada devolve a mesa ao estado **livre** e restitui o crédito ao utilizador.  
-  * O objetivo final (não totalmente implementado) seria um botão "Comprar" que transformaria as mesas selecionadas em mesas **compradas** (verdes), finalizando a reserva.  
-* **Interação em Tempo Real:** A principal característica é a simultaneidade. Quando um utilizador seleciona uma mesa, essa mudança é refletida instantaneamente nos ecrãs de **todos** os outros utilizadores conectados. A mesa aparecerá como selecionada por outro utilizador (amarela), impedindo a seleção por duas pessoas ao mesmo tempo.  
-* **Gestão de Sessão e Consistência:**  
-  * **Logout Explícito:** Se um utilizador clica em "Logout", o sistema garante que todas as mesas que ele tinha no estado "selecionada" sejam automaticamente devolvidas ao estado "livre", e os créditos correspondentes são restituídos à sua conta.  
-  * **Desconexão Inesperada:** Para garantir a justiça e a disponibilidade das mesas, o sistema deteta se um utilizador simplesmente fechou o browser ou perdeu a ligação. Nesse caso, o backend executa a mesma rotina de limpeza do logout, libertando as mesas e devolvendo os créditos automaticamente.
+*   **Backend**: Node.js, Express.js, TypeScript, WebSockets (biblioteca `ws`)
+*   **Frontend**: React, TypeScript, HTML5, CSS3
+*   **Banco de Dados**: MongoDB (NoSQL)
+*   **Autenticação**: Tokens JWT (JSON Web Tokens)
 
-## **Descrição Técnica**
+---
 
-A aplicação segue uma arquitetura moderna e desacoplada, com uma clara separação de responsabilidades entre o backend e o frontend.
+## Lógica da Aplicação
 
-### **Backend**
+O sistema opera com base em um conjunto de regras que definem como os usuários interagem com as mesas e gerenciam seus créditos.
 
-O backend é construído em Node.js e é responsável pela lógica de negócio, gestão de dados e comunicação em tempo real.
+### 1. Usuários e Créditos
 
-* **Stack:** Node.js, Express.js, TypeScript, MongoDB, Mongoose, WebSockets (ws).  
-* **Arquitetura:** A estrutura segue o padrão MVC (Model-View-Controller) com uma camada de Serviços, promovendo a separação de interesses.  
-  * **models/**: Define os schemas de dados para o Mongoose.  
-    * user.model.ts: Estrutura do documento do utilizador (nome, idCasa, email, senha, créditos).  
-    * table.model.ts: Estrutura do documento da mesa (posição, status, tipo, ownerId).  
-  * **services/**: Contém a lógica de negócio principal, desacoplada de HTTP ou WebSockets.  
-    * auth.service.ts: Lida com o registo, login e, crucialmente, a lógica de releaseUserTablesOnLogout, que utiliza **transações do MongoDB** para garantir que a devolução de créditos e a libertação de mesas aconteçam de forma atómica (ou tudo ou nada).  
-    * table.service.ts: Contém a lógica de negócio para o clique numa mesa.  
-    * websocket.service.ts: Centraliza a gestão das ligações WebSocket ativas e a função de broadcastMapUpdate.  
-  * **controllers/**: Fazem a ponte entre os pedidos e os serviços.  
-    * auth.controller.ts: Recebe os pedidos HTTP das rotas, chama os serviços de autenticação e envia a resposta.  
-    * websocket.controller.ts: Orquestra o que acontece quando uma nova ligação WebSocket é estabelecida (on('connection')) e quando ela é terminada (on('close')). É no evento on('close') que a lógica de limpeza por desconexão inesperada é acionada.  
-  * **routes/**: Define os endpoints da API REST.  
-    * auth.routes.ts: Mapeia as URLs (/register, /login, /logout) para os seus respetivos controladores.  
-  * **middleware/**: Funções que processam os pedidos antes de chegarem aos controladores.  
-    * auth.middleware.ts: Protege rotas (como /logout) verificando a validade do token JWT enviado no cabeçalho Authorization.
+*   Existem dois tipos de usuários: **Usuário Normal** e **Administrador**.
+*   O acesso é feito via login (`id-casa`, `senha`). Novos usuários começam com **2 Créditos Normais** e **0 Créditos Especiais**.
+*   **Crédito Normal**: Usado para selecionar mesas temporariamente. É um recurso consumível e reembolsável.
+*   **Crédito Especial**: Usado para comprar mesas diretamente. É ganho ao confirmar a compra de mesas selecionadas.
 
-### **Frontend**
+### 2. O Mapa e os Estados das Mesas
 
-O frontend é uma Single-Page Application (SPA) construída com React, focada em reatividade e numa boa experiência de utilizador.
+O mapa é uma matriz de mesas, onde cada mesa pode ser **Simples ("S")** ou **Dupla ("D")**. O estado de cada mesa é comunicado visualmente através de um sistema de cores, que depende do status, do tipo e de quem realizou a ação.
 
-* **Stack:** React, TypeScript.  
-* **Arquitetura:** A estrutura é baseada em componentes, com uma gestão de estado clara e uma camada de serviços para a comunicação com a API.  
-  * **pages/**: Componentes que representam as "telas" principais da aplicação.  
-    * LoginPage.tsx: Responsável pelo formulário de login e registo.  
-    * MapPage.tsx: Ecrã principal que orquestra a exibição do mapa de mesas e o modal de confirmação de logout.  
-  * **components/**: Componentes reutilizáveis que formam as páginas.  
-    * Header.tsx, TableGrid.tsx, Table.tsx: Componentes visuais para o mapa.  
-    * ConfirmationModal.tsx: Um modal genérico e reutilizável que pede a confirmação do utilizador para ações importantes.  
-  * **contexts/**: Utiliza a Context API do React para a gestão de estado global.  
-    * AuthContext.tsx: Mantém o estado de autenticação (token, idCasa) e fornece as funções login e logout para toda a aplicação. A função logout foi implementada para primeiro chamar a API do backend antes de limpar os dados locais.  
-    * WebSocketContext.tsx: Gere o estado recebido via WebSocket (a lista de mesas, os créditos) e fornece-o aos componentes que precisam de ser atualizados em tempo real.  
-  * **hooks/**: Hooks customizados para encapsular lógicas complexas.  
-    * useWebSocket.ts: Isola toda a lógica de ligação, receção e envio de mensagens WebSocket. Isto torna os componentes que o usam muito mais limpos, pois não precisam de se preocupar com os detalhes da gestão da ligação.  
-  * **api/**: Camada de serviço para a comunicação com o backend.  
-    * authService.ts: Centraliza todas as chamadas fetch relacionadas com a autenticação (loginUser, registerUser, logoutUser). Isto desacopla os componentes da lógica de rede, facilitando a manutenção.
+| Status da Mesa                      | Tipo    | Cor          | Interação                                   |
+| ----------------------------------- | ------- | ------------ | ------------------------------------------- |
+| **Livre**                           | -       | **Branco**   | Clicável (se o usuário tiver créditos)      |
+| **Selecionada pelo usuário atual**  | Simples | **Azul Claro** | Clicável para liberar ou transformar em dupla |
+|                                     | Dupla   | **Azul Escuro**| Clicável para liberar                       |
+| **Comprada pelo usuário atual**     | Simples | **Verde Claro**| Clicável para liberar                       |
+|                                     | Dupla   | **Verde Escuro**| Clicável para liberar                       |
+| **Selecionada por outro usuário**   | Simples | **Amarelo Claro**| Não interativa                              |
+|                                     | Dupla   | **Amarelo Escuro**| Não interativa                              |
+| **Comprada por outro usuário**      | Simples | **Cinza Claro**| Não interativa                              |
+|                                     | Dupla   | **Cinza Escuro**| Não interativa                              |
 
-## **Como Executar o Projeto**
+### 3. Regras de Interação (Cliques nas Mesas)
 
-### **Pré-requisitos**
+A ação de um clique em uma mesa depende do estado dela e do saldo de créditos do usuário. O sistema segue uma máquina de estados bem definida:
 
-* Node.js (versão 16 ou superior)  
-* npm ou yarn  
-* Uma instância do MongoDB a correr (localmente ou na nuvem)
+*   **Clicar em uma Mesa Livre (Branca):**
+    *   Se o usuário tiver **Crédito Especial**, a mesa se torna **Comprada ("S", Verde Claro)** e 1 Crédito Especial é gasto.
+    *   Caso contrário, se tiver **Crédito Normal**, a mesa se torna **Selecionada ("S", Azul Claro)** e 1 Crédito Normal é gasto.
+    *   Se não tiver nenhum dos créditos, nada acontece.
 
-### **Backend**
+*   **Clicar em uma Mesa Selecionada "S" (Azul Claro) pelo próprio usuário:**
+    *   Se o usuário tiver **Crédito Normal**, a mesa é transformada em **Dupla ("D", Azul Escuro)**, gastando mais 1 Crédito Normal.
+    *   Se não tiver Crédito Normal, a seleção é cancelada: a mesa fica **Livre (Branca)** e o usuário recebe **1 Crédito Normal** de volta.
 
-1. Navegue para a pasta do projeto backend.  
-2. Instale as dependências:  
-   npm install
+*   **Clicar em uma Mesa Selecionada "D" (Azul Escuro):**
+    *   A seleção é cancelada: a mesa fica **Livre (Branca)** e o usuário recebe **2 Créditos Normais** de volta.
 
-3. Crie um arquivo .env na raiz da pasta do backend com o seguinte conteúdo, substituindo pelos seus valores:  
-   PORT=8080  
-   MONGODB\_URI=mongodb://localhost:27017/table-reservation  
-   JWT\_SECRET=o\_seu\_segredo\_super\_secreto
+*   **Clicar em uma Mesa Comprada (Verde):**
+    *   A compra é desfeita: a mesa fica **Livre (Branca)** e o respectivo valor em **Créditos Especiais** é devolvido (1 para "S", 2 para "D").
 
-4. Execute o servidor em modo de desenvolvimento:  
-   npm run dev
+### 4. Ações Especiais
 
-   O servidor estará a correr em http://localhost:8080.
+*   **Comprar Mesas:**
+    *   O usuário pode confirmar a compra de todas as suas mesas selecionadas (azuis) através de um pop-up.
+    *   Ao confirmar, as mesas mudam de **Selecionada (Azul)** para **Comprada (Verde)**.
+    *   O usuário ganha **1 Crédito Especial** para cada Crédito Normal gasto na seleção (1 para mesa "S", 2 para mesa "D").
 
-### **Frontend**
+*   **Logout:**
+    *   Se o usuário tiver mesas selecionadas (azuis), um pop-up de confirmação aparece, avisando sobre a perda das seleções.
+    *   Se confirmado, as mesas selecionadas voltam ao estado **Livre**, os **Créditos Normais** correspondentes são reembolsados, e a sessão é encerrada. Mesas compradas (verdes) não são afetadas.
 
-1. Navegue para a pasta do projeto frontend.  
-2. Instale as dependências:  
-   npm install
+---
 
-3. Execute a aplicação React:  
-   npm start
+## Arquitetura da Aplicação: Backend vs. Frontend
 
-   A aplicação abrirá no seu browser, geralmente em http://localhost:3000.
+A aplicação é dividida em duas partes distintas que se comunicam via API REST (para autenticação) e WebSockets (para interações em tempo real).
+
+### Backend (A Fonte da Verdade)
+
+O backend, construído com Node.js e Express, é o cérebro da aplicação. Suas responsabilidades são:
+
+*   **Gerenciar a Lógica de Negócio:** Implementa todas as regras de interação, a máquina de estados das mesas e a gestão de créditos.
+*   **Ser a Autoridade Central:** O servidor é a única fonte da verdade para o estado do mapa. Nenhuma lógica de jogo é executada no cliente.
+*   **Comunicação em Tempo Real:** Mantém um servidor WebSocket. Ele recebe eventos simples dos clientes (ex: `{"evento": "cliqueMesa", "idMesa": "A1"}`) e, após processar a ação, transmite (**broadcast**) o estado atualizado do mapa para **todos** os clientes conectados.
+*   **Persistência de Dados:** Conecta-se ao MongoDB para armazenar e atualizar informações de usuários, mesas e seus estados de forma atômica, prevenindo conflitos e condições de corrida (`race conditions`).
+*   **Autenticação e Segurança:** Gerencia o registro, login e logout de usuários, emitindo e validando tokens JWT para proteger as rotas e identificar os usuários nas conexões WebSocket.
+
+### Frontend (A Interface Reativa)
+
+O frontend, construído com React, é a camada de apresentação visual e de interação. Suas responsabilidades são:
+
+*   **Renderizar a Interface:** Exibe o mapa de mesas, o saldo de créditos e outros elementos da UI com base nos dados recebidos do servidor.
+*   **Gerenciar a Conexão WebSocket:** Estabelece e mantém a conexão com o servidor WebSocket, ouvindo por mensagens de atualização do mapa.
+*   **Reagir a Mudanças de Estado:** Quando recebe uma mensagem de `atualizacaoMapa` do backend, o frontend redesenha a interface para refletir o novo estado, aplicando as cores e textos corretos ("S" ou "D") a cada mesa.
+*   **Enviar Intenções do Usuário:** Captura as ações do usuário (como cliques em mesas) e as envia como mensagens simples ao backend, sem processar nenhuma regra complexa.
+*   **Orquestrar a Experiência do Usuário:** Lida com a exibição de formulários de login/registro e pop-ups modais para confirmações, interagindo com a API do backend quando necessário.
