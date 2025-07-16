@@ -6,6 +6,13 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
+# Copia todo o código-fonte
 COPY . .
-EXPOSE 5000
-CMD ["node", "server.js"]
+
+# Transpila o TypeScript para JavaScript
+RUN npm run build
+
+EXPOSE 8080
+
+# Executa o arquivo JavaScript compilado (geralmente na pasta 'dist')
+CMD ["node", "dist/server.js"]
