@@ -1,19 +1,15 @@
-# backend/Dockerfile
-FROM node:18
-
+# Etapa 1: Build
+FROM node:18 AS builder
 WORKDIR /app
-
 COPY package*.json ./
-RUN npm install
-
-
-# Copia todo o código-fonte
+RUN npm ci --omit=dev
 COPY . .
-
-# Transpila o TypeScript para JavaScript
 RUN npm run build
 
+# Etapa 2: Executar JS puro
+FROM node:18-alpine
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
 EXPOSE 8080
-
-# Executa o arquivo JavaScript compilado (geralmente na pasta 'dist')
 CMD ["node", "dist/server.js"]

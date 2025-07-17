@@ -1,16 +1,14 @@
-# frontend/Dockerfile
-FROM node:18
-
+# Etapa 1: Build
+FROM node:18 AS builder
 WORKDIR /app
-
 COPY package*.json ./
-RUN npm install
+RUN npm ci --omit=dev
 
 COPY . .
 RUN npm run build
 
-# Usar nginx para servir o build
+# Etapa 2: Servir com nginx
 FROM nginx:stable-alpine
-COPY --from=0 /app/build /usr/share/nginx/html
-EXPOSE 3000
+COPY --from=builder /app/build /usr/share/nginx/html
+EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
