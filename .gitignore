@@ -12,3 +12,4 @@
 /frontend/.env
 /frontend/.DS_Store
 /instrucoes.md
+/frontend/src/constants.ts

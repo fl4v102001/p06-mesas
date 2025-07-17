@@ -6,6 +6,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
+
 # Copia todo o código-fonte
 COPY . .
 
