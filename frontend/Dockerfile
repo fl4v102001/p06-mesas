@@ -3,7 +3,9 @@ FROM node:18 AS builder
 
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --omit=dev
+RUN npm install
+
+RUN npm install -g typescript
 
 COPY . .
 RUN npm run build
