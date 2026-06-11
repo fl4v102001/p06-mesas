@@ -7,6 +7,7 @@ import http from 'http';
 import cors from 'cors';
 import { WebSocketServer } from 'ws';
 import dotenv from 'dotenv';
+import path from 'path';
 
 // Importações de Configuração e Modelos
 import { connectDB } from './config/db';
@@ -74,6 +75,15 @@ const startServer = async () => {
     app.use('/api/auth', authRoutes);
     app.use('/api/config', settingsRoutes);
     app.use('/api/tables', tableRoutes);
+
+    // 1. Servir os arquivos estáticos do frontend (React)
+    const frontendBuildPath = path.join(__dirname, '../../frontend/dist');
+    app.use(express.static(frontendBuildPath));
+
+    // 2. Rota "catch-all" para o React Router assumir o controle da URL
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(frontendBuildPath, 'index.html'));
+    });
 
     wss.on('connection', (ws, req) => {
         handleConnection(ws, req, wsService);
