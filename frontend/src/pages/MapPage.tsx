@@ -1,4 +1,3 @@
-
 // -----------------------------------------------------------------------------
 // Arquivo: src/pages/MapPage.tsx (MODIFICADO)
 // -----------------------------------------------------------------------------
@@ -7,20 +6,29 @@ import { WebSocketProvider, WebSocketContext } from '../contexts/WebSocketContex
 import { Header } from '../components/Header';
 import { TableGrid } from '../components/TableGrid';
 import { ConfirmationModal } from '../components/ConfirmationModal';
+import { LeftInfoPanel } from '../components/LeftInfoPanel';
+import { RightInfoPanel } from '../components/RightInfoPanel';
+import { SvgSpriteLoader } from '../components/SvgSpriteLoader';
 import { AuthContext } from '../contexts/AuthContext';
 import { SettingsContext } from '../contexts/SettingsContext';
 import { purchaseTables } from '../api/tableService';
 import { styles } from '../styles/appStyles';
 
-// O conteúdo da página do mapa foi movido para este novo componente
 const MapPageContent: React.FC = () => {
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
     const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
     const [purchaseDetails, setPurchaseDetails] = useState({ count: 0, total: 0 });
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
     
     const auth = useContext(AuthContext);
     const wsContext = useContext(WebSocketContext);
     const settingsContext = useContext(SettingsContext);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const handleLogoutRequest = () => {
         if (!auth || !wsContext) return;
@@ -83,8 +91,13 @@ const MapPageContent: React.FC = () => {
 
     return (
         <div style={styles.mapPage}>
+            <SvgSpriteLoader url="/mesa-svg.html" />
             <Header onLogoutClick={handleLogoutRequest} onBuyClick={handleBuyClick} />
-            <TableGrid />
+            <div style={styles.mainContentContainer}>
+                {!isMobile && <LeftInfoPanel />}
+                <TableGrid />
+                {!isMobile && <RightInfoPanel />}
+            </div>
             <ConfirmationModal
                 isOpen={isLogoutModalOpen}
                 title="Confirmar Logout"
@@ -105,7 +118,6 @@ const MapPageContent: React.FC = () => {
     );
 }
 
-// O componente MapPage agora serve como o provedor de contexto
 export const MapPage: React.FC = () => {
     return (
         <WebSocketProvider>
