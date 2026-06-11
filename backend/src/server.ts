@@ -77,7 +77,7 @@ const startServer = async () => {
     app.use('/api/tables', tableRoutes);
 
     // 1. Servir os arquivos estáticos do frontend (React)
-    const frontendBuildPath = path.join(__dirname, '../../frontend/public');
+    const frontendBuildPath = path.join(__dirname, '../../frontend/build');
     app.use(express.static(frontendBuildPath));
 
     // 2. Rota "catch-all" para o React Router assumir o controle da URL
