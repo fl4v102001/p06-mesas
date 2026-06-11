@@ -81,7 +81,7 @@ const startServer = async () => {
     app.use(express.static(frontendBuildPath));
 
     // 2. Rota "catch-all" para o React Router assumir o controle da URL
-    app.get('*', (req, res) => {
+    app.get(/.*/, (req, res) => {
         res.sendFile(path.join(frontendBuildPath, 'index.html'));
     });
 
