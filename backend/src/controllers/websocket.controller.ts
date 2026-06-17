@@ -10,9 +10,12 @@ import { releaseUserTablesOnLogout } from '../services/auth.service';
  * Lida com uma nova conexão WebSocket, incluindo autenticação e tratamento de eventos.
  */
 export const handleConnection = (ws: WebSocket, req: http.IncomingMessage, wsService: WebSocketService) => {
-    const token = req.url?.split('token=')[1];
-    if (!token) {
-        ws.close(1008, 'Token não fornecido');
+    const token = req.url?.split('token=')[1]?.split('&')[0];
+    const eventIdParam = req.url?.split('eventId=')[1]?.split('&')[0];
+    const eventId = eventIdParam ? parseInt(eventIdParam, 10) : null;
+
+    if (!token || !eventId || isNaN(eventId)) {
+        ws.close(1008, 'Token ou EventId não fornecido');
         return;
     }
 
@@ -20,8 +23,8 @@ export const handleConnection = (ws: WebSocket, req: http.IncomingMessage, wsSer
         const decoded = jwt.verify(token, config.jwtSecret) as { userId: string; idCasa: string; };
         const { userId, idCasa } = decoded;
 
-        wsService.addConnection(idCasa, ws);
-        wsService.broadcastMapUpdate();
+        wsService.addConnection(idCasa, ws, eventId);
+        wsService.broadcastMapUpdate(eventId);
 
         // Lida com mensagens recebidas do cliente
         ws.on('message', async (message: string) => {
@@ -29,8 +32,8 @@ export const handleConnection = (ws: WebSocket, req: http.IncomingMessage, wsSer
                 const data = JSON.parse(message);
                 
                 if (data.type === 'cliqueMesa') {
-                    await handleTableClickService(idCasa, data.payload.linha, data.payload.coluna);
-                    await wsService.broadcastMapUpdate();
+                    await handleTableClickService(idCasa, data.payload.linha, data.payload.coluna, eventId);
+                    await wsService.broadcastMapUpdate(eventId);
                 }
             } catch (error) {
                 console.error('Erro ao processar mensagem WebSocket:', error);
@@ -47,8 +50,10 @@ export const handleConnection = (ws: WebSocket, req: http.IncomingMessage, wsSer
                 // Remove a conexão da lista de conexões ativas
                 wsService.removeConnection(idCasa);
 
-                // Notifica todos os outros clientes que as mesas foram liberadas
-                await wsService.broadcastMapUpdate();
+                // Notifica todos os clientes do evento atual que as mesas foram liberadas
+                // (Se ele tiver mesas em outros eventos, elas também foram liberadas no DB,
+                // mas a atualização do mapa aqui vai só pro evento em que ele estava).
+                await wsService.broadcastMapUpdate(eventId);
 
                 console.log(`Limpeza para ${idCasa} concluída com sucesso.`);
             } catch (error) {

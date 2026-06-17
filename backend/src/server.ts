@@ -19,6 +19,7 @@ import { EventEntity } from './models/postgres/Event.entity'; // <-- NOVO: Entit
 import authRoutes from './routes/auth.routes';
 import settingsRoutes from './routes/settings.routes';
 import tableRoutes from './routes/table.routes';
+import eventRoutes from './routes/event.routes';
 
 // Importações de Serviços e Controladores
 import { initializeTables, nameEmptyTables } from './services/table.service'; // <-- NOVO
@@ -78,6 +79,7 @@ const startServer = async () => {
     app.use('/api/auth', authRoutes);
     app.use('/api/config', settingsRoutes);
     app.use('/api/tables', tableRoutes);
+    app.use('/api/events', eventRoutes);
 
     // 1. Servir os arquivos estáticos do frontend (React)
     const frontendBuildPath = path.join(__dirname, '../../frontend/build');

@@ -22,6 +22,7 @@ export interface MapUpdatePayload {
 }
 
 export interface ISettings {
+    id: string;
     eventName: string;
     mapRows: number;
     mapCols: number;
@@ -53,6 +54,8 @@ export interface WebSocketContextType {
 
 export interface SettingsContextType {
     settings: ISettings | null;
+    events: ISettings[];
+    setActiveEventId: (id: string) => void;
     isLoading: boolean;
 }
 

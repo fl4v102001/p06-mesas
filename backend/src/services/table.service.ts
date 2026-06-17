@@ -80,10 +80,10 @@ export const initializeTables = async (event: EventEntity) => {
 /**
  * Lida com a lógica de clique em uma mesa, aplicando as novas regras de negócio.
  */
-export const handleTableClickService = async (user_idCasa: string, linha: number, coluna: number) => {
+export const handleTableClickService = async (user_idCasa: string, linha: number, coluna: number, eventId: number) => {
     await AppDataSource.manager.transaction(async (transactionalEntityManager) => {
         const credit = await transactionalEntityManager.findOne(CreditEntity, { where: { codigoLote: user_idCasa } });
-        const seat = await transactionalEntityManager.findOne(SeatEntity, { where: { linha, coluna } });
+        const seat = await transactionalEntityManager.findOne(SeatEntity, { where: { linha, coluna, idEvent: eventId } });
 
         if (!credit || !seat) {
             throw new Error("Usuário (Crédito) ou mesa não encontrados.");

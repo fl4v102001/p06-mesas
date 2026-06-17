@@ -19,7 +19,31 @@ export const Header: React.FC<HeaderProps> = ({ onLogoutClick, onBuyClick }) => 
 
     return (
         <header style={styles.header}>
-            <h1 style={styles.headerTitle}>{settingsContext?.settings?.eventName || 'Mapa de Mesas'}</h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <h1 style={styles.headerTitle}>Mapa de Mesas</h1>
+                {settingsContext?.events && settingsContext.events.length > 0 && (
+                    <select
+                        value={settingsContext.settings?.id || ''}
+                        onChange={(e) => settingsContext.setActiveEventId(e.target.value)}
+                        style={{
+                            padding: '5px 10px',
+                            borderRadius: '4px',
+                            border: '1px solid #ccc',
+                            backgroundColor: '#fff',
+                            fontSize: '16px',
+                            color: '#333',
+                            outline: 'none',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        {settingsContext.events.map(event => (
+                            <option key={event.id} value={event.id}>
+                                {event.eventName}
+                            </option>
+                        ))}
+                    </select>
+                )}
+            </div>
             <div style={styles.userInfoBar}>
                 <div style={styles.userInfo}>
                     <span>ID-Casa: <strong>{auth?.idCasa}</strong></span>

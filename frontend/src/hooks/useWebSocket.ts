@@ -6,16 +6,16 @@ import { useState, useEffect, useRef } from 'react';
 import { WEBSOCKET_URL } from '../constants';
 import { TableData, MapUpdatePayload, UserCreditsData } from '../types';
 
-export const useWebSocket = (token: string | null) => {
+export const useWebSocket = (token: string | null, eventId: string | null) => {
     const [tables, setTables] = useState<TableData[]>([]);
     const [usersCredits, setUsersCredits] = useState<Record<string, UserCreditsData>>({});
     const [isConnected, setIsConnected] = useState(false);
     const ws = useRef<WebSocket | null>(null);
 
     useEffect(() => {
-        if (!token) return;
+        if (!token || !eventId) return;
 
-        ws.current = new WebSocket(`${WEBSOCKET_URL}?token=${token}`);
+        ws.current = new WebSocket(`${WEBSOCKET_URL}?token=${token}&eventId=${eventId}`);
 
         ws.current.onopen = () => {
             console.log('WebSocket Conectado');
@@ -40,7 +40,7 @@ export const useWebSocket = (token: string | null) => {
         return () => {
             ws.current?.close();
         };
-    }, [token]);
+    }, [token, eventId]);
 
     const sendMessage = (message: object) => {
         if (ws.current && ws.current.readyState === WebSocket.OPEN) {
