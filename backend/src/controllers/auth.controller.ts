@@ -11,7 +11,7 @@ export const login = async (req: Request, res: Response) => {
     try {
         const { idCasa } = req.body;
         const { token, user } = await loginUserService(idCasa);
-        res.json({ token, idCasa: user.codigoLote, creditos: user.qtyCredits, creditos_especiais: user.mustPay });
+        res.json({ token, idCasa: user.codigoLote, creditos: user.qtyCredits, creditos_especiais: user.mustPay, isReadOnly: user.isReadOnly });
     } catch (error: any) {
         res.status(400).json({ message: error.message });
     }

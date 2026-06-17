@@ -28,7 +28,7 @@ export const LoginPage: React.FC = () => {
 
         try {
             const data = await loginUser(formData.idCasa);
-            auth?.login(data.token, data.idCasa);
+            auth?.login(data.token, data.idCasa, data.isReadOnly);
         } catch (err: any) {
             setError(err.message);
         }

@@ -41,7 +41,8 @@ export interface ISettings {
 export interface AuthContextType {
     token: string | null;
     idCasa: string | null;
-    login: (token: string, idCasa: string) => void;
+    isReadOnly: boolean;
+    login: (token: string, idCasa: string, isReadOnly?: boolean) => void;
     logout: () => Promise<void>;
 }
 

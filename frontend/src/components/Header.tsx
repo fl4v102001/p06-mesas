@@ -47,11 +47,18 @@ export const Header: React.FC<HeaderProps> = ({ onLogoutClick, onBuyClick }) => 
             <div style={styles.userInfoBar}>
                 <div style={styles.userInfo}>
                     <span>ID-Casa: <strong>{auth?.idCasa}</strong></span>
-                    <span>Créditos: <strong>{wsContext?.userCredits ?? '...'}</strong></span>
+                    {!auth?.isReadOnly && (
+                        <span>Créditos: <strong>{wsContext?.userCredits ?? '...'}</strong></span>
+                    )}
+                    {auth?.isReadOnly && (
+                        <span style={{ color: 'orange', marginLeft: '10px' }}><strong>(Somente Leitura)</strong></span>
+                    )}
                 </div>
                 <div style={styles.userActions}>
                     <button style={styles.configButton} hidden={true}>Config</button>
-                    <button onClick={onBuyClick} style={styles.buyButton}>Comprar</button>
+                    {!auth?.isReadOnly && (
+                        <button onClick={onBuyClick} style={styles.buyButton}>Comprar</button>
+                    )}
                     <button onClick={onLogoutClick} style={styles.logoutButton}>Logout</button>
                 </div>
             </div>

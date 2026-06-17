@@ -9,14 +9,20 @@ export const loginUserService = async (idCasa: string) => {
     const creditRepository = AppDataSource.getRepository(CreditEntity);
     
     const credit = await creditRepository.findOne({ where: { codigoLote: idCasa } });
+    
     if (!credit) {
-        throw new Error('ID-Casa não encontrado. Verifique e tente novamente.');
+        // Se o ID-Casa não existir, retorna um token com acesso somente leitura
+        const token = jwt.sign({ userId: 'guest', idCasa, isReadOnly: true }, config.jwtSecret, { expiresIn: '1d' });
+        return { 
+            token, 
+            user: { codigoLote: idCasa, qtyCredits: 0, mustPay: 0, isReadOnly: true } 
+        };
     }
     
     // Todos os outros campos do user.model.ts (incluindo senha) foram descartados.
     // Então, consideramos apenas o idCasa (codigoLote) para o token.
-    const token = jwt.sign({ userId: credit.id, idCasa: credit.codigoLote }, config.jwtSecret, { expiresIn: '1d' });
-    return { token, user: credit };
+    const token = jwt.sign({ userId: credit.id, idCasa: credit.codigoLote, isReadOnly: false }, config.jwtSecret, { expiresIn: '1d' });
+    return { token, user: { ...credit, isReadOnly: false } };
 };
 
 
