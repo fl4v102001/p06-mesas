@@ -33,13 +33,22 @@ export const handleConnection = (ws: WebSocket, req: http.IncomingMessage, wsSer
                 
                 if (data.type === 'cliqueMesa') {
                     const payloadEventId = data.payload.eventId ? parseInt(data.payload.eventId, 10) : null;
-                    if (!payloadEventId || payloadEventId !== eventId) {
-                        console.warn(`Aviso: Cliente ${idCasa} enviou cliqueMesa com eventId=${payloadEventId} inválido ou diferente da conexao=${eventId}`);
+                    const currentConnectionEventId = wsService.activeConnections.get(idCasa)?.eventId;
+                    
+                    if (!payloadEventId || payloadEventId !== currentConnectionEventId) {
+                        console.warn(`Aviso: Cliente ${idCasa} enviou cliqueMesa com eventId=${payloadEventId} diferente da conexao=${currentConnectionEventId}`);
                         return;
                     }
 
                     await handleTableClickService(idCasa, data.payload.linha, data.payload.coluna, payloadEventId);
                     await wsService.broadcastMapUpdate(payloadEventId);
+                } else if (data.type === 'trocarEvento') {
+                    const newEventId = parseInt(data.payload.eventId, 10);
+                    if (!isNaN(newEventId)) {
+                        wsService.changeConnectionEvent(idCasa, newEventId);
+                        // Ao invés de mandar um broadcast completo, atualiza especificamente o evento que foi trocado
+                        await wsService.broadcastMapUpdate(newEventId);
+                    }
                 }
             } catch (error) {
                 console.error('Erro ao processar mensagem WebSocket:', error);

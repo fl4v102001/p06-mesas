@@ -11,14 +11,12 @@ export const useWebSocket = (token: string | null, eventId: string | null) => {
     const [usersCredits, setUsersCredits] = useState<Record<string, UserCreditsData>>({});
     const [isConnected, setIsConnected] = useState(false);
     const ws = useRef<WebSocket | null>(null);
+    const [initialEventId] = useState(eventId); // Capture initial eventId for connection
 
     useEffect(() => {
-        if (!token || !eventId) return;
+        if (!token || !initialEventId) return;
 
-        setTables([]);
-        setUsersCredits({});
-
-        ws.current = new WebSocket(`${WEBSOCKET_URL}?token=${token}&eventId=${eventId}`);
+        ws.current = new WebSocket(`${WEBSOCKET_URL}?token=${token}&eventId=${initialEventId}`);
 
         ws.current.onopen = () => {
             console.log('WebSocket Conectado');
@@ -39,11 +37,30 @@ export const useWebSocket = (token: string | null, eventId: string | null) => {
             }
         };
 
-        // Cleanup function
+        // Cleanup function only runs on unmount or token change
         return () => {
             ws.current?.close();
         };
-    }, [token, eventId]);
+    }, [token, initialEventId]);
+
+    // Lida com a troca de eventos sem desconectar
+    useEffect(() => {
+        if (!eventId) return;
+
+        setTables([]);
+        setUsersCredits({});
+
+        if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+            ws.current.send(JSON.stringify({ type: 'trocarEvento', payload: { eventId } }));
+        } else if (ws.current && ws.current.readyState === WebSocket.CONNECTING) {
+            // Se ainda estiver conectando, enviará no onopen se necessário
+            const onOpenOriginal = ws.current.onopen;
+            ws.current.onopen = (e) => {
+                if (onOpenOriginal && ws.current) onOpenOriginal.call(ws.current, e);
+                ws.current?.send(JSON.stringify({ type: 'trocarEvento', payload: { eventId } }));
+            };
+        }
+    }, [eventId]);
 
     const sendMessage = (message: object) => {
         if (ws.current && ws.current.readyState === WebSocket.OPEN) {

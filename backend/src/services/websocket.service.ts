@@ -27,6 +27,14 @@ export class WebSocketService {
         }
     }
 
+    changeConnectionEvent(idCasa: string, newEventId: number) {
+        const conn = this.activeConnections.get(idCasa);
+        if (conn) {
+            conn.eventId = newEventId;
+            console.log(`Cliente ${idCasa} mudou para o evento ${newEventId}.`);
+        }
+    }
+
     // Envia o estado atualizado do mapa para os clientes conectados a um evento específico ou a todos
     async broadcastMapUpdate(eventId?: number) {
         try {
