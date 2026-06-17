@@ -49,8 +49,8 @@ export const Table: React.FC<TableProps> = ({ tableData, baseWidth, baseHeight, 
     };
     const getTableColor = (): string => {
         const { status, tipo, ownerId } = tableData;
-        if (status === 'selecionada') return ownerId === auth?.idCasa ? (tipo === 'mesa-4' ? '#ADD8E6' : '#00008B') : (tipo === 'mesa-6' ? '#fafa8bff' : '#FFD700');
-        if (status === 'comprada') return ownerId === auth?.idCasa ? (tipo === 'mesa-4' ? '#8cfe8cff' : '#006400') : (tipo === 'mesa-6' ? '#c1c1c1ff' : '#A9A9A9');
+        if (status === 'selecionada') return ownerId === auth?.idCasa ? (tipo === 'mesa-4' ? '#ADD8E6' : '#ADD8E6') : (tipo === 'mesa-6' ? '#fafa8bff' : '#FFD700');
+        if (status === 'comprada') return ownerId === auth?.idCasa ? (tipo === 'mesa-4' ? '#8cfe8cff' : '#8cfe8cff') : (tipo === 'mesa-6' ? '#c1c1c1ff' : '#A9A9A9');
         return '#FFFFFF';
     };
     const isClickable = !auth?.isReadOnly && (tableData.status === 'livre' || tableData.ownerId === auth?.idCasa);
@@ -58,6 +58,8 @@ export const Table: React.FC<TableProps> = ({ tableData, baseWidth, baseHeight, 
     const cellStyle = { ...styles.tableContainer, width: `${cellWidth}px`, height: `${cellHeight}px`, cursor: isClickable ? 'pointer' : 'not-allowed' };
     const svgStyle = { ...styles.tableSvg, width: `${svgWidth}px`, height: `${svgHeight}px`, position: 'absolute' as 'absolute', top: `${randomOffset.y}px`, left: `${randomOffset.x}px`, fill: tableColor };
     const textStyle = { ...styles.tableText, top: `calc(40% + ${randomOffset.y}px)`, left: `calc(50% + ${randomOffset.x}px)` };
+    const svgMesa = tableData.tipo === 'mesa-4' ? '#mesa-forma' : '#mesa-acessivel';
+    // Se for acessivel, troca a cor para azul
     
     return (
         <>
@@ -68,7 +70,7 @@ export const Table: React.FC<TableProps> = ({ tableData, baseWidth, baseHeight, 
                 onMouseLeave={() => setTooltipVisible(false)}
                 onMouseMove={handleMouseMove}
             >
-                <svg style={svgStyle} preserveAspectRatio="none"><use href="#mesa-forma" /></svg>
+                <svg style={svgStyle} preserveAspectRatio="none"><use href={svgMesa} /></svg>
                 {tableData.tipo && <span style={textStyle}>{tableData.ownerId}</span>}
             </div>
             <Tooltip

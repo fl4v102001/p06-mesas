@@ -94,14 +94,14 @@ export const handleTableClickService = async (user_idCasa: string, linha: number
             // Prioridade 1: Usar crédito especial (mustPay) para comprar diretamente
             if (credit.mustPay >= 1) {
                 seat.status = 'comprada';
-                seat.tipo = 'mesa-4';
+//                seat.tipo = 'mesa-4';
                 seat.ownerId = credit.codigoLote;
                 credit.mustPay -= 1;
             }
             // Prioridade 2: Usar crédito normal para selecionar
             else if (credit.qtyCredits >= 1) {
                 seat.status = 'selecionada';
-                seat.tipo = 'mesa-4';
+//                seat.tipo = 'mesa-4';
                 seat.ownerId = credit.codigoLote;
                 credit.qtyCredits -= 1;
             }
@@ -110,14 +110,14 @@ export const handleTableClickService = async (user_idCasa: string, linha: number
         // Cenário 2: Clicar em uma mesa "selecionada" pelo próprio usuário
         else if (seat.status === 'selecionada' && seat.ownerId === credit.codigoLote) {
             seat.status = 'livre';
-            seat.tipo = 'mesa-4';
+//            seat.tipo = 'mesa-4';
             seat.ownerId = null;
             credit.qtyCredits += 1; // Devolve 1 crédito normal
         }
         // Cenário 3: Clicar em uma mesa "comprada" pelo próprio usuário
         else if (seat.status === 'comprada' && seat.ownerId === credit.codigoLote) {
             seat.status = 'livre';
-            seat.tipo = 'mesa-4';
+//            seat.tipo = 'mesa-4';
             seat.ownerId = null;
             credit.mustPay += 1; // Devolve 1 crédito especial
         }

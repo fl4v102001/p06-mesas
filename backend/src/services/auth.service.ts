@@ -44,7 +44,7 @@ export const releaseUserTablesOnLogout = async (userId: string, idCasa: string) 
                 // 2. Calcular os créditos a serem devolvidos
                 const creditsToReturn = selectedSeats.reduce((acc, seat) => {
                     if (seat.tipo === 'mesa-4') return acc + 1;
-                    if (seat.tipo === 'mesa-6') return acc + 2;
+                    if (seat.tipo === 'mesa-6') return acc + 1;
                     return acc;
                 }, 0);
 
@@ -60,7 +60,7 @@ export const releaseUserTablesOnLogout = async (userId: string, idCasa: string) 
                 // 4. Atualizar as mesas para o estado 'livre'
                 for (const seat of selectedSeats) {
                     seat.status = 'livre';
-                    seat.tipo = 'mesa-4';
+//                    seat.tipo = 'mesa-4';
                     seat.ownerId = null;
                 }
                 await transactionalEntityManager.save(selectedSeats);
