@@ -17,9 +17,14 @@ export class WebSocketService {
         console.log(`Cliente ${idCasa} conectado ao evento ${eventId}. Conexões ativas: ${this.activeConnections.size}`);
     }
 
-    removeConnection(idCasa: string) {
-        this.activeConnections.delete(idCasa);
-        console.log(`Cliente ${idCasa} desconectado. Conexões ativas: ${this.activeConnections.size}`);
+    removeConnection(idCasa: string, ws: WebSocket) {
+        const conn = this.activeConnections.get(idCasa);
+        if (conn && conn.ws === ws) {
+            this.activeConnections.delete(idCasa);
+            console.log(`Cliente ${idCasa} desconectado. Conexões ativas: ${this.activeConnections.size}`);
+        } else {
+            console.log(`Cliente ${idCasa} desconectou uma aba antiga, a nova permanece ativa.`);
+        }
     }
 
     // Envia o estado atualizado do mapa para os clientes conectados a um evento específico ou a todos

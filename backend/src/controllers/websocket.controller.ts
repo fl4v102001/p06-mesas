@@ -53,8 +53,8 @@ export const handleConnection = (ws: WebSocket, req: http.IncomingMessage, wsSer
                 // Chama a mesma função de serviço usada pelo logout explícito
                 await releaseUserTablesOnLogout(userId, idCasa);
 
-                // Remove a conexão da lista de conexões ativas
-                wsService.removeConnection(idCasa);
+                // Remove a conexão da lista de conexões ativas se for a mesma
+                wsService.removeConnection(idCasa, ws);
 
                 // Notifica todos os clientes do evento atual que as mesas foram liberadas
                 // (Se ele tiver mesas em outros eventos, elas também foram liberadas no DB,

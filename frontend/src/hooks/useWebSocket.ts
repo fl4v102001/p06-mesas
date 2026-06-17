@@ -15,6 +15,9 @@ export const useWebSocket = (token: string | null, eventId: string | null) => {
     useEffect(() => {
         if (!token || !eventId) return;
 
+        setTables([]);
+        setUsersCredits({});
+
         ws.current = new WebSocket(`${WEBSOCKET_URL}?token=${token}&eventId=${eventId}`);
 
         ws.current.onopen = () => {
