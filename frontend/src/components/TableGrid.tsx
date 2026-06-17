@@ -27,9 +27,9 @@ export const TableGrid: React.FC = () => {
         const { mapRows, mapCols, placeholders } = settingsContext.settings;
         const placeholderSet = new Set(placeholders.map(p => `${p.linha},${p.coluna}`));
         const tablesMap = new Map(wsContext.tables.map(t => [`${t.linha},${t.coluna}`, t]));
-        const newGrid: (TableData | null)[][] = Array(mapRows).fill(null).map(() => Array(mapCols).fill(null));
-        for (let i = 0; i < mapRows; i++) {
-            for (let j = 0; j < mapCols; j++) {
+        const newGrid: (TableData | null)[][] = Array(mapRows+1).fill(null).map(() => Array(mapCols+1).fill(null));
+        for (let i = 0; i <= mapRows; i++) {
+            for (let j = 0; j <= mapCols; j++) {
                 const key = `${i},${j}`;
                 if (!placeholderSet.has(key)) {
                     newGrid[i][j] = tablesMap.get(key) || { _id: key, linha: i, coluna: j, status: 'livre', tipo: null, ownerId: null };
