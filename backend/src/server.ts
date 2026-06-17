@@ -11,8 +11,9 @@ import path from 'path';
 
 // Importações de Configuração e Modelos
 import { connectDB } from './config/db';
+import { AppDataSource } from './config/data-source';
 import { setAppConfig } from './config/appConfig';
-import { Settings } from './models/settings.models'; // <-- CORREÇÃO: Importar do caminho correto
+import { EventEntity } from './models/postgres/Event.entity'; // <-- NOVO: Entity do Postgres
 
 // Importações de Rotas
 import authRoutes from './routes/auth.routes';
@@ -28,17 +29,19 @@ dotenv.config();
 
 const startServer = async () => {
     // Conectar ao Banco de Dados
-    await connectDB(process.env.MONGODB_URI || 'mongodb://localhost:27017/table-reservation');
+    await connectDB();
+
+    const eventRepository = AppDataSource.getRepository(EventEntity);
 
     // Procura pela configuração ATIVA
-    let activeSettings = await Settings.findOne({ status: 'ativo' });
+    let activeSettings = await eventRepository.findOne({ where: { status: 'ativo' } });
 
     if (!activeSettings) {
-        const anySettings = await Settings.findOne();
+        const anySettings = await eventRepository.findOne({ where: {} });
         if (!anySettings) {
             console.log("Nenhum documento de configuração encontrado. Criando um novo com status 'ativo'...");
-            activeSettings = new Settings();
-            await activeSettings.save();
+            activeSettings = eventRepository.create({ status: 'ativo' });
+            await eventRepository.save(activeSettings);
             console.log("Documento de configuração padrão criado.");
         } else {
             console.error("ERRO CRÍTICO: Existem configurações no banco de dados, mas nenhuma está marcada como 'ativa'.");

@@ -1,5 +1,6 @@
 .DS_Store
 .env
+build/
 /resposta-gemini.md
 /backend/.env
 /backend/node_modules

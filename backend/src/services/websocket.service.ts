@@ -1,6 +1,7 @@
 import { WebSocketServer, WebSocket } from 'ws';
-import { Table } from '../models/table.model';
-import { User } from '../models/user.model';
+import { AppDataSource } from '../config/data-source';
+import { SeatEntity } from '../models/postgres/Seat.entity';
+import { CreditEntity } from '../models/postgres/Credit.entity';
 
 // Este serviço gerencia as conexões e o envio de mensagens via WebSocket
 export class WebSocketService {
@@ -24,13 +25,15 @@ export class WebSocketService {
     // Envia o estado atualizado do mapa para todos os clientes conectados
     async broadcastMapUpdate() {
         try {
-            const tables = await Table.find({});
-            // 1. Buscar também os creditos_especiais
-            const users = await User.find({}, 'idCasa creditos creditos_especiais');
+            const seatRepository = AppDataSource.getRepository(SeatEntity);
+            const creditRepository = AppDataSource.getRepository(CreditEntity);
+
+            const tables = await seatRepository.find();
+            const credits = await creditRepository.find();
  
             // 2. Montar o objeto com ambos os créditos
-            const usersCreditsMap = users.reduce((acc, user) => {
-                acc[user.idCasa] = { creditos: user.creditos, creditos_especiais: user.creditos_especiais };
+            const usersCreditsMap = credits.reduce((acc, credit) => {
+                acc[credit.codigoLote] = { creditos: credit.qtyCredits, creditos_especiais: credit.mustPay };
                 return acc;
             }, {} as Record<string, { creditos: number, creditos_especiais: number }>);
 

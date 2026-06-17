@@ -1,96 +1,89 @@
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
-import mongoose from 'mongoose';
-import { User, IUser } from '../models/user.model';
-import { Table } from '../models/table.model';
+import { AppDataSource } from '../config/data-source';
+import { SeatEntity } from '../models/postgres/Seat.entity';
+import { CreditEntity } from '../models/postgres/Credit.entity';
 import { config } from '../config';
 
-// ... (as funções registerUserService e loginUserService permanecem as mesmas)
-
 export interface RegisterUserDto {
-    nomeCompleto: string;
-    idCasa: string;
-    email: string;
-    senha: string;
+    idCasa: string; // Map to codigoLote
+    // Outros campos foram descartados conforme a nova regra de negócio
 }
 
 export const registerUserService = async (userData: RegisterUserDto) => {
-    const { nomeCompleto, idCasa, email, senha } = userData;
-    const existingUser = await User.findOne({ $or: [{ email }, { idCasa }] });
-    if (existingUser) {
-        throw new Error('Email ou ID-Casa já existem.');
+    const { idCasa } = userData;
+    const creditRepository = AppDataSource.getRepository(CreditEntity);
+
+    const existingCredit = await creditRepository.findOne({ where: { codigoLote: idCasa } });
+    if (existingCredit) {
+        throw new Error('ID-Casa (Código Lote) já existe.');
     }
-    const hashedPassword = await bcrypt.hash(senha, 10);
-    const newUser = new User({ nomeCompleto, idCasa, email, senha: hashedPassword, creditos: 2, perfil: 'user', creditos_especiais: 0 });
-    await newUser.save();
-    return newUser;
+    
+    // Create new credit entity with default credits
+    const newCredit = creditRepository.create({ codigoLote: idCasa, qtyCredits: 2, mustPay: 0 });
+    await creditRepository.save(newCredit);
+    return newCredit;
 };
 
-export const loginUserService = async (idCasa: string, senha: string): Promise<{ token: string; user: IUser }> => {
-    const user = await User.findOne({ idCasa });
-    if (!user) {
+export const loginUserService = async (idCasa: string, senha?: string) => {
+    const creditRepository = AppDataSource.getRepository(CreditEntity);
+    
+    const credit = await creditRepository.findOne({ where: { codigoLote: idCasa } });
+    if (!credit) {
         throw new Error('Credenciais inválidas.');
     }
-    const isMatch = await bcrypt.compare(senha, user.senha);
-    if (!isMatch) {
-        throw new Error('Credenciais inválidas.');
-    }
-    const token = jwt.sign({ userId: user._id, idCasa: user.idCasa }, config.jwtSecret, { expiresIn: '1d' });
-    return { token, user };
+    
+    // Todos os outros campos do user.model.ts (incluindo senha) foram descartados.
+    // Então, consideramos apenas o idCasa (codigoLote) para o token.
+    const token = jwt.sign({ userId: credit.id, idCasa: credit.codigoLote }, config.jwtSecret, { expiresIn: '1d' });
+    return { token, user: credit };
 };
 
 
 /**
  * Libera as mesas selecionadas por um usuário durante o logout.
  * Executa uma transação para garantir a consistência dos dados.
- * @param userId O ID (_id) do usuário que está a fazer logout.
+ * @param userId O ID do usuário que está a fazer logout.
  * @param idCasa O ID-Casa do usuário, usado para encontrar as mesas.
  */
 export const releaseUserTablesOnLogout = async (userId: string, idCasa: string) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
+    await AppDataSource.manager.transaction(async (transactionalEntityManager) => {
+        try {
+            // 1. Encontrar todas as mesas selecionadas pelo usuário usando o codigoLote (idCasa)
+            const selectedSeats = await transactionalEntityManager.find(SeatEntity, {
+                where: { ownerId: idCasa, status: 'selecionada' }
+            });
 
-    try {
-        // 1. Encontrar todas as mesas selecionadas pelo usuário usando o idCasa
-        const selectedTables = await Table.find({
-            ownerId: idCasa, // <-- CORREÇÃO: Usar idCasa para encontrar as mesas
-            status: 'selecionada'
-        }).session(session);
+            if (selectedSeats.length > 0) {
+                // 2. Calcular os créditos a serem devolvidos
+                const creditsToReturn = selectedSeats.reduce((acc, seat) => {
+                    if (seat.tipo === 'S') return acc + 1;
+                    if (seat.tipo === 'D') return acc + 2;
+                    return acc;
+                }, 0);
 
-        if (selectedTables.length > 0) {
-            // 2. Calcular os créditos a serem devolvidos
-            const creditsToReturn = selectedTables.reduce((acc, table) => {
-                if (table.tipo === 'S') return acc + 1;
-                if (table.tipo === 'D') return acc + 2;
-                return acc;
-            }, 0);
+                // 3. Atualizar o documento de créditos com os créditos devolvidos
+                if (creditsToReturn > 0) {
+                    const credit = await transactionalEntityManager.findOne(CreditEntity, { where: { codigoLote: idCasa } });
+                    if (credit) {
+                        credit.qtyCredits += creditsToReturn;
+                        await transactionalEntityManager.save(credit);
+                    }
+                }
 
-            // 3. Atualizar o documento do usuário com os créditos devolvidos usando o _id
-            if (creditsToReturn > 0) {
-                await User.findByIdAndUpdate(
-                    userId, // <-- CORRETO: Usar o _id para atualizar o usuário
-                    { $inc: { creditos: creditsToReturn } },
-                    { session }
-                );
+                // 4. Atualizar as mesas para o estado 'livre'
+                for (const seat of selectedSeats) {
+                    seat.status = 'livre';
+                    seat.tipo = 'mesa-4';
+                    seat.ownerId = null;
+                }
+                await transactionalEntityManager.save(selectedSeats);
             }
 
-            // 4. Atualizar as mesas para o estado 'livre'
-            const tableIdsToRelease = selectedTables.map(t => t._id);
-            await Table.updateMany(
-                { _id: { $in: tableIdsToRelease } },
-                { $set: { status: 'livre', tipo: null, ownerId: null } },
-                { session }
-            );
+            console.log(`Transação de logout para o usuário ${idCasa} concluída com sucesso.`);
+
+        } catch (error) {
+            console.error(`Erro na transação de logout para o usuário ${idCasa}:`, error);
+            throw new Error('Falha ao processar o logout e liberar as mesas.');
         }
-
-        await session.commitTransaction();
-        console.log(`Transação de logout para o usuário ${idCasa} concluída com sucesso.`);
-
-    } catch (error) {
-        await session.abortTransaction();
-        console.error(`Erro na transação de logout para o usuário ${idCasa}:`, error);
-        throw new Error('Falha ao processar o logout e liberar as mesas.');
-    } finally {
-        session.endSession();
-    }
+    });
 };
