@@ -17,12 +17,15 @@ export class WebSocketService {
         console.log(`Cliente ${idCasa} conectado ao evento ${eventId}. Conexões ativas: ${this.activeConnections.size}`);
     }
 
-    removeConnection(idCasa: string, ws: WebSocket) {
+    removeConnection(idCasa: string, ws?: WebSocket) {
         const conn = this.activeConnections.get(idCasa);
-        if (conn && conn.ws === ws) {
+        
+        // Se `ws` foi fornecido, removemos apenas se a conexão for exatamente a mesma (caso do close automático)
+        // Se `ws` não foi fornecido (caso do logout manual via HTTP), forçamos a remoção.
+        if (conn && (!ws || conn.ws === ws)) {
             this.activeConnections.delete(idCasa);
             console.log(`Cliente ${idCasa} desconectado. Conexões ativas: ${this.activeConnections.size}`);
-        } else {
+        } else if (conn && ws && conn.ws !== ws) {
             console.log(`Cliente ${idCasa} desconectou uma aba antiga, a nova permanece ativa.`);
         }
     }
