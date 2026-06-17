@@ -18,14 +18,14 @@ const MapPageContent: React.FC = () => {
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
     const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
     const [purchaseDetails, setPurchaseDetails] = useState({ count: 0, total: 0 });
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    const [isMobileOrTablet, setIsMobileOrTablet] = useState(window.innerWidth <= 1024);
     
     const auth = useContext(AuthContext);
     const wsContext = useContext(WebSocketContext);
     const settingsContext = useContext(SettingsContext);
 
     useEffect(() => {
-        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        const handleResize = () => setIsMobileOrTablet(window.innerWidth <= 1024);
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
@@ -94,9 +94,9 @@ const MapPageContent: React.FC = () => {
             <SvgSpriteLoader url="/mesa-svg.html" />
             <Header onLogoutClick={handleLogoutRequest} onBuyClick={handleBuyClick} />
             <div style={styles.mainContentContainer}>
-                {!isMobile && <LeftInfoPanel />}
+                {!isMobileOrTablet && <LeftInfoPanel />}
                 <TableGrid />
-                {!isMobile && <RightInfoPanel />}
+                {!isMobileOrTablet && <RightInfoPanel />}
             </div>
             <ConfirmationModal
                 isOpen={isLogoutModalOpen}
