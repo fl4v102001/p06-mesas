@@ -49,7 +49,7 @@ export const Aquecedor: React.FC<AquecedorProps> = ({ tableData, baseWidth, base
                 onMouseLeave={() => setTooltipVisible(false)}
                 onMouseMove={handleMouseMove}
             >
-                <svg style={svgStyle} preserveAspectRatio="none"><use href="#mesa-forma" /></svg>
+                <svg style={svgStyle} preserveAspectRatio="none"><use href="#aquecedor2" /></svg>
             </div>
             <Tooltip
                 visible={tooltipVisible}
