@@ -94,14 +94,14 @@ export const handleTableClickService = async (user_idCasa: string, linha: number
             // Prioridade 1: Usar crédito especial (mustPay) para comprar diretamente
             if (credit.mustPay >= 1) {
                 seat.status = 'comprada';
-                seat.tipo = 'S';
+                seat.tipo = 'mesa-4';
                 seat.ownerId = credit.codigoLote;
                 credit.mustPay -= 1;
             }
             // Prioridade 2: Usar crédito normal para selecionar
             else if (credit.qtyCredits >= 1) {
                 seat.status = 'selecionada';
-                seat.tipo = 'S';
+                seat.tipo = 'mesa-4';
                 seat.ownerId = credit.codigoLote;
                 credit.qtyCredits -= 1;
             }
@@ -133,12 +133,12 @@ export const handleTableClickService = async (user_idCasa: string, linha: number
  * @param userId O ID (_id) do usuário.
  * @param idCasa O ID-Casa do usuário.
  */
-export const purchaseSelectedTables = async (userId: string, idCasa: string) => {
+export const purchaseSelectedTables = async (userId: string, idCasa: string, eventId: number) => {
     await AppDataSource.manager.transaction(async (transactionalEntityManager) => {
         try {
             // 1. Encontrar as mesas selecionadas e o crédito associado
             const selectedSeats = await transactionalEntityManager.find(SeatEntity, {
-                where: { ownerId: idCasa, status: 'selecionada' }
+                where: { ownerId: idCasa, status: 'selecionada', idEvent: eventId }
             });
 
             if (selectedSeats.length === 0) {

@@ -37,8 +37,8 @@ export const releaseUserTablesOnLogout = async (userId: string, idCasa: string) 
             if (selectedSeats.length > 0) {
                 // 2. Calcular os créditos a serem devolvidos
                 const creditsToReturn = selectedSeats.reduce((acc, seat) => {
-                    if (seat.tipo === 'S') return acc + 1;
-                    if (seat.tipo === 'D') return acc + 2;
+                    if (seat.tipo === 'mesa-4') return acc + 1;
+                    if (seat.tipo === 'mesa-6') return acc + 2;
                     return acc;
                 }, 0);
 

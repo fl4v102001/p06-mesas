@@ -5,6 +5,7 @@
 import React, { useContext, useMemo, useState } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { WebSocketContext } from '../contexts/WebSocketContext';
+import { SettingsContext } from '../contexts/SettingsContext';
 import { TableData } from '../types';
 import { styles } from '../styles/appStyles';
 import { Tooltip } from './Tooltip';
@@ -22,11 +23,12 @@ interface TableProps {
 export const Table: React.FC<TableProps> = ({ tableData, baseWidth, baseHeight, scaleIncrement, svgScale, maxOffsetX, maxOffsetY }) => {
     const auth = useContext(AuthContext);
     const wsContext = useContext(WebSocketContext);
+    const settingsContext = useContext(SettingsContext);
     
     const [tooltipVisible, setTooltipVisible] = useState(false);
     const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
 
-    const randomOffset = useMemo(() => ({ x: Math.random() * maxOffsetX, y: Math.random() * maxOffsetY }), [maxOffsetX, maxOffsetY]);
+    const randomOffset = useMemo(() => ({ x: (Math.random() - 0.5) * maxOffsetX, y: (Math.random() - 0.5) * maxOffsetY }), [maxOffsetX, maxOffsetY]);
     const scaleFactor = 1 + (tableData.linha * scaleIncrement);
     const cellWidth = baseWidth * scaleFactor;
     const cellHeight = baseHeight * scaleFactor;
@@ -37,7 +39,14 @@ export const Table: React.FC<TableProps> = ({ tableData, baseWidth, baseHeight, 
         setTooltipPosition({ x: e.clientX + 15, y: e.clientY + 15 });
     };
 
-    const handleClick = () => { if (isClickable) wsContext?.sendMessage({ type: 'cliqueMesa', payload: { linha: tableData.linha, coluna: tableData.coluna } }); };
+    const handleClick = () => { 
+        if (isClickable) {
+            const eventId = settingsContext?.settings?.id;
+            if (eventId) {
+                wsContext?.sendMessage({ type: 'cliqueMesa', payload: { linha: tableData.linha, coluna: tableData.coluna, eventId } }); 
+            }
+        }
+    };
     const getTableColor = (): string => {
         const { status, tipo, ownerId } = tableData;
         if (status === 'selecionada') return ownerId === auth?.idCasa ? (tipo === 'mesa-4' ? '#ADD8E6' : '#00008B') : (tipo === 'mesa-6' ? '#fafa8bff' : '#FFD700');

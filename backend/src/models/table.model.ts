@@ -8,7 +8,7 @@ export interface ITable extends Document {
     linha: number;
     coluna: number;
     status: 'livre' | 'selecionada' | 'comprada';
-    tipo: 'S' | 'D' | null;
+    tipo: 'mesa-4' | 'mesa-6' | null;
     ownerId: string | null;
     nome: string; // <-- NOVO
 }
@@ -18,7 +18,7 @@ const TableSchema: Schema = new Schema<ITable>({
     linha: { type: Number, required: true },
     coluna: { type: Number, required: true },
     status: { type: String, enum: ['livre', 'selecionada', 'comprada'], default: 'livre' },
-    tipo: { type: String, enum: ['S', 'D', null], default: null },
+    tipo: { type: String, enum: ['mesa-4', 'mesa-6'], default: null },
     ownerId: { type: String, default: null },
     nome: { type: String, default: '' }, // <-- NOVO
 });

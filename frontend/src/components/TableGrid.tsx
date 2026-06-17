@@ -58,7 +58,7 @@ export const TableGrid: React.FC = () => {
                                     maxOffsetY={maxOffsetY}
                                 />;
                             }
-                            if (table && table.tipo === 'mesa-4') {
+                            if (table && (table.tipo === 'mesa-4' || table.tipo === 'mesa-6')) {
                                 return <Table 
                                     key={table._id} 
                                     tableData={table} 

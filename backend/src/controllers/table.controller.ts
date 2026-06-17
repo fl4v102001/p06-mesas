@@ -11,15 +11,25 @@ export const purchaseTablesController = async (req: Request, res: Response) => {
     try {
         const userId = req.user?.userId;
         const idCasa = req.user?.idCasa;
+        const eventIdParam = req.body?.eventId;
 
         if (!userId || !idCasa) {
             return res.status(400).json({ message: 'Informação de usuário ausente no token.' });
         }
 
-        await purchaseSelectedTables(userId, idCasa);
+        if (!eventIdParam) {
+            return res.status(400).json({ message: 'eventId não fornecido na requisição.' });
+        }
 
-        // Notifica todos os clientes sobre a atualização do mapa
-        await req.wsService.broadcastMapUpdate();
+        const eventId = parseInt(eventIdParam, 10);
+        if (isNaN(eventId)) {
+            return res.status(400).json({ message: 'eventId inválido.' });
+        }
+
+        await purchaseSelectedTables(userId, idCasa, eventId);
+
+        // Notifica os clientes sobre a atualização do mapa focado no evento atual
+        await req.wsService.broadcastMapUpdate(eventId);
 
         res.status(200).json({ message: 'Compra realizada com sucesso!' });
 

@@ -3,13 +3,14 @@
 // -----------------------------------------------------------------------------
 import { API_URL } from '../constants';
 
-export const purchaseTables = async (token: string) => {
+export const purchaseTables = async (token: string, eventId: string) => {
     const response = await fetch(`${API_URL}/api/tables/purchase`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
         },
+        body: JSON.stringify({ eventId }),
     });
 
     if (!response.ok) {

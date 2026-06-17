@@ -74,9 +74,9 @@ const MapPageContent: React.FC = () => {
     };
 
     const handleConfirmPurchase = async () => {
-        if (!auth?.token) return;
+        if (!auth?.token || !settingsContext?.settings?.id) return;
         try {
-            await purchaseTables(auth.token);
+            await purchaseTables(auth.token, settingsContext.settings.id);
         } catch (error) {
             console.error("Erro ao comprar mesas:", error);
             let errorMessage = "Ocorreu um erro desconhecido.";

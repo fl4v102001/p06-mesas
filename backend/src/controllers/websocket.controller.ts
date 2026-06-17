@@ -32,8 +32,14 @@ export const handleConnection = (ws: WebSocket, req: http.IncomingMessage, wsSer
                 const data = JSON.parse(message);
                 
                 if (data.type === 'cliqueMesa') {
-                    await handleTableClickService(idCasa, data.payload.linha, data.payload.coluna, eventId);
-                    await wsService.broadcastMapUpdate(eventId);
+                    const payloadEventId = data.payload.eventId ? parseInt(data.payload.eventId, 10) : null;
+                    if (!payloadEventId || payloadEventId !== eventId) {
+                        console.warn(`Aviso: Cliente ${idCasa} enviou cliqueMesa com eventId=${payloadEventId} inválido ou diferente da conexao=${eventId}`);
+                        return;
+                    }
+
+                    await handleTableClickService(idCasa, data.payload.linha, data.payload.coluna, payloadEventId);
+                    await wsService.broadcastMapUpdate(payloadEventId);
                 }
             } catch (error) {
                 console.error('Erro ao processar mensagem WebSocket:', error);
