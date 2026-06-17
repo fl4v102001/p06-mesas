@@ -4,32 +4,13 @@ import { SeatEntity } from '../models/postgres/Seat.entity';
 import { CreditEntity } from '../models/postgres/Credit.entity';
 import { config } from '../config';
 
-export interface RegisterUserDto {
-    idCasa: string; // Map to codigoLote
-    // Outros campos foram descartados conforme a nova regra de negócio
-}
 
-export const registerUserService = async (userData: RegisterUserDto) => {
-    const { idCasa } = userData;
-    const creditRepository = AppDataSource.getRepository(CreditEntity);
-
-    const existingCredit = await creditRepository.findOne({ where: { codigoLote: idCasa } });
-    if (existingCredit) {
-        throw new Error('ID-Casa (Código Lote) já existe.');
-    }
-    
-    // Create new credit entity with default credits
-    const newCredit = creditRepository.create({ codigoLote: idCasa, qtyCredits: 2, mustPay: 0 });
-    await creditRepository.save(newCredit);
-    return newCredit;
-};
-
-export const loginUserService = async (idCasa: string, senha?: string) => {
+export const loginUserService = async (idCasa: string) => {
     const creditRepository = AppDataSource.getRepository(CreditEntity);
     
     const credit = await creditRepository.findOne({ where: { codigoLote: idCasa } });
     if (!credit) {
-        throw new Error('Credenciais inválidas.');
+        throw new Error('ID-Casa não encontrado. Verifique e tente novamente.');
     }
     
     // Todos os outros campos do user.model.ts (incluindo senha) foram descartados.

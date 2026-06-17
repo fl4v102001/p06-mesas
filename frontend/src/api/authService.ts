@@ -3,13 +3,12 @@
 // Arquivo: src/api/authService.ts
 // -----------------------------------------------------------------------------
 import { API_URL } from '../constants';
-import { RegisterFormData } from '../types';
 
-export const loginUser = async (idCasa: string, senha: string) => {
+export const loginUser = async (idCasa: string) => {
     const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idCasa, senha }),
+        body: JSON.stringify({ idCasa }),
     });
     if (!response.ok) {
         const data = await response.json();
@@ -18,18 +17,7 @@ export const loginUser = async (idCasa: string, senha: string) => {
     return response.json();
 };
 
-export const registerUser = async (formData: RegisterFormData) => {
-    const response = await fetch(`${API_URL}/api/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-    });
-    if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || 'Erro ao registar.');
-    }
-    return response.json();
-};
+
 
 // Nova função para o logout no backend
 export const logoutUser = async (token: string) => {

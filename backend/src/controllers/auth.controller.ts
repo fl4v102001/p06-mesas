@@ -1,30 +1,16 @@
 import { Request, Response } from 'express';
 // Controlador para autenticação de usuários
 import {
-    registerUserService,
     loginUserService,
     releaseUserTablesOnLogout
 } from '../services/auth.service';
 
 
-export const register = async (req: Request, res: Response) => {
-    try {
-        const { idCasa } = req.body;
-        if (!idCasa) {
-            return res.status(400).json({ message: 'O campo idCasa é obrigatório.' });
-        }
-
-        await registerUserService({ idCasa });
-        res.status(201).json({ message: 'Usuário registrado com sucesso.' });
-    } catch (error: any) {
-        res.status(400).json({ message: error.message });
-    }
-};
 
 export const login = async (req: Request, res: Response) => {
     try {
-        const { idCasa, senha } = req.body;
-        const { token, user } = await loginUserService(idCasa, senha);
+        const { idCasa } = req.body;
+        const { token, user } = await loginUserService(idCasa);
         res.json({ token, idCasa: user.codigoLote, creditos: user.qtyCredits, creditos_especiais: user.mustPay });
     } catch (error: any) {
         res.status(400).json({ message: error.message });

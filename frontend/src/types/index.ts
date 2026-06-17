@@ -59,10 +59,7 @@ export interface SettingsContextType {
     isLoading: boolean;
 }
 
-export interface RegisterFormData {
-    nomeCompleto: string;
+export interface LoginFormData {
     idCasa: string;
-    email: string;
-    senha: string;
 }
 
