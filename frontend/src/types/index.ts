@@ -6,9 +6,9 @@ export interface TableData {
     linha: number;
     coluna: number;
     status: 'livre' | 'selecionada' | 'comprada';
-    tipo: 'S' | 'D' | null;
+    tipo: 'mesa-4' | 'mesa-6'| 'vazio' | 'aquecedor' | null;
     ownerId: string | null;
-    nome?: string; // <-- NOVO Optional field for table name 
+    nome?: string;
 }
 
 export interface UserCreditsData {

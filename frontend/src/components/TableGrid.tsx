@@ -7,6 +7,7 @@ import { SettingsContext } from '../contexts/SettingsContext';
 import { TableData } from '../types';
 import { Table } from './Table';
 import { styles } from '../styles/appStyles';
+import { Aquecedor } from './Aquecedor';
 
 export const TableGrid: React.FC = () => {
     const wsContext = useContext(WebSocketContext);
@@ -39,14 +40,25 @@ export const TableGrid: React.FC = () => {
     }, [wsContext?.tables, settingsContext?.settings]);
 
     if (!wsContext?.isConnected || settingsContext?.isLoading) return <p>A ligar ao servidor e a carregar o mapa...</p>;
-
     return (
         <div style={styles.gridContainer}>
             <div style={styles.gridContentWrapper}>
                 {grid.map((row, rowIndex) => (
                     <div key={rowIndex} style={styles.gridRow}>
                         {row.map((table, colIndex) => {
-                            if (table) {
+                            if (table && table.tipo === 'aquecedor') {
+                                return <Aquecedor 
+                                    key={table._id} 
+                                    tableData={table} 
+                                    baseWidth={baseWidth}
+                                    baseHeight={baseHeight}
+                                    scaleIncrement={scaleIncrement}
+                                    svgScale={svgScale}
+                                    maxOffsetX={maxOffsetX}
+                                    maxOffsetY={maxOffsetY}
+                                />;
+                            }
+                            if (table && table.tipo === 'mesa-4') {
                                 return <Table 
                                     key={table._id} 
                                     tableData={table} 

@@ -64,8 +64,8 @@ const MapPageContent: React.FC = () => {
         }
 
         const totalCost = userSelectedTables.reduce((sum, table) => {
-            if (table.tipo === 'S') return sum + priceS;
-            if (table.tipo === 'D') return sum + priceD;
+            if (table.tipo === 'mesa-4') return sum + priceS;
+            if (table.tipo === 'mesa-6') return sum + priceD;
             return sum;
         }, 0);
 

@@ -2,14 +2,12 @@
 // -----------------------------------------------------------------------------
 // Arquivo: src/components/Table.tsx (MODIFICADO)
 // -----------------------------------------------------------------------------
-import React, { useContext, useMemo, useState } from 'react';
-import { AuthContext } from '../contexts/AuthContext';
-import { WebSocketContext } from '../contexts/WebSocketContext';
+import React, { useMemo, useState } from 'react';
 import { TableData } from '../types';
 import { styles } from '../styles/appStyles';
 import { Tooltip } from './Tooltip';
 
-interface TableProps { 
+interface AquecedorProps {
     tableData: TableData;
     baseWidth: number;
     baseHeight: number;
@@ -19,10 +17,7 @@ interface TableProps {
     maxOffsetY: number;
 }
 
-export const Table: React.FC<TableProps> = ({ tableData, baseWidth, baseHeight, scaleIncrement, svgScale, maxOffsetX, maxOffsetY }) => {
-    const auth = useContext(AuthContext);
-    const wsContext = useContext(WebSocketContext);
-    
+export const Aquecedor: React.FC<AquecedorProps> = ({ tableData, baseWidth, baseHeight, scaleIncrement, svgScale, maxOffsetX, maxOffsetY }) => {
     const [tooltipVisible, setTooltipVisible] = useState(false);
     const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
 
@@ -37,14 +32,9 @@ export const Table: React.FC<TableProps> = ({ tableData, baseWidth, baseHeight, 
         setTooltipPosition({ x: e.clientX + 15, y: e.clientY + 15 });
     };
 
-    const handleClick = () => { if (isClickable) wsContext?.sendMessage({ type: 'cliqueMesa', payload: { linha: tableData.linha, coluna: tableData.coluna } }); };
-    const getTableColor = (): string => {
-        const { status, tipo, ownerId } = tableData;
-        if (status === 'selecionada') return ownerId === auth?.idCasa ? (tipo === 'mesa-4' ? '#ADD8E6' : '#00008B') : (tipo === 'mesa-6' ? '#fafa8bff' : '#FFD700');
-        if (status === 'comprada') return ownerId === auth?.idCasa ? (tipo === 'mesa-4' ? '#8cfe8cff' : '#006400') : (tipo === 'mesa-6' ? '#c1c1c1ff' : '#A9A9A9');
-        return '#FFFFFF';
-    };
-    const isClickable = tableData.status === 'livre' || tableData.ownerId === auth?.idCasa;
+    const handleClick = () => { };
+    const getTableColor = (): string => { return '#ff0000ff'; };
+    const isClickable = false;
     const tableColor = getTableColor();
     const cellStyle = { ...styles.tableContainer, width: `${cellWidth}px`, height: `${cellHeight}px`, cursor: isClickable ? 'pointer' : 'not-allowed' };
     const svgStyle = { ...styles.tableSvg, width: `${svgWidth}px`, height: `${svgHeight}px`, position: 'absolute' as 'absolute', top: `${randomOffset.y}px`, left: `${randomOffset.x}px`, fill: tableColor };
@@ -60,15 +50,13 @@ export const Table: React.FC<TableProps> = ({ tableData, baseWidth, baseHeight, 
                 onMouseMove={handleMouseMove}
             >
                 <svg style={svgStyle} preserveAspectRatio="none"><use href="#mesa-forma" /></svg>
-                {tableData.tipo && <span style={textStyle}>{tableData.ownerId}</span>}
             </div>
             <Tooltip
                 visible={tooltipVisible}
                 position={tooltipPosition}
                 content={
                     <div>
-                        <p style={styles.tooltipTitle}>Mesa</p>
-                        <strong style={styles.tooltipContent}>{tableData.nome || ''}</strong>
+                        <p style={styles.tooltipTitle}>Aquecedor</p>
                     </div>
                 }
             />
