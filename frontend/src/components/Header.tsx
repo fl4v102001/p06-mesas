@@ -20,28 +20,6 @@ export const Header: React.FC<HeaderProps> = ({ onLogoutClick, onBuyClick }) => 
     return (
         <header style={styles.header}>
             <h1 style={styles.headerTitle}>Mapa de Mesas</h1>
-            {settingsContext?.events && settingsContext.events.length > 0 && (
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '15px' }}>
-                    {settingsContext.events.map(event => (
-                        <button
-                            key={event.id}
-                            onClick={() => settingsContext.setActiveEventId(event.id)}
-                            style={{
-                                padding: '8px 16px',
-                                borderRadius: '4px',
-                                border: settingsContext.settings?.id === event.id ? '2px solid #007bff' : '1px solid #ccc',
-                                backgroundColor: settingsContext.settings?.id === event.id ? '#007bff' : '#fff',
-                                color: settingsContext.settings?.id === event.id ? '#fff' : '#333',
-                                fontSize: '16px',
-                                cursor: 'pointer',
-                                fontWeight: settingsContext.settings?.id === event.id ? 'bold' : 'normal'
-                            }}
-                        >
-                            {event.eventName}
-                        </button>
-                    ))}
-                </div>
-            )}
             <div style={styles.userInfoBar}>
                 <div style={styles.userInfo}>
                     <span>ID-Casa: <strong>{auth?.idCasa}</strong></span>
@@ -52,6 +30,29 @@ export const Header: React.FC<HeaderProps> = ({ onLogoutClick, onBuyClick }) => 
                         <span style={{ color: 'orange', marginLeft: '10px' }}><strong>(Somente Leitura)</strong></span>
                     )}
                 </div>
+
+                {settingsContext?.events && settingsContext.events.length > 0 && (
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+                        {settingsContext.events.map(event => (
+                            <button
+                                key={event.id}
+                                onClick={() => settingsContext.setActiveEventId(event.id)}
+                                style={{
+                                    padding: '8px 16px',
+                                    borderRadius: '4px',
+                                    border: settingsContext.settings?.id === event.id ? '2px solid #007bff' : '1px solid #ccc',
+                                    backgroundColor: settingsContext.settings?.id === event.id ? '#007bff' : '#fff',
+                                    color: settingsContext.settings?.id === event.id ? '#fff' : '#333',
+                                    fontSize: '16px',
+                                    cursor: 'pointer',
+                                    fontWeight: settingsContext.settings?.id === event.id ? 'bold' : 'normal'
+                                }}
+                            >
+                                {event.eventName}
+                            </button>
+                        ))}
+                    </div>
+                )}
                 <div style={styles.userActions}>
                     <button style={styles.configButton} hidden={true}>Config</button>
                     {!auth?.isReadOnly && (
