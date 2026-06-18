@@ -19,31 +19,29 @@ export const Header: React.FC<HeaderProps> = ({ onLogoutClick, onBuyClick }) => 
 
     return (
         <header style={styles.header}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <h1 style={styles.headerTitle}>Mapa de Mesas</h1>
-                {settingsContext?.events && settingsContext.events.length > 0 && (
-                    <select
-                        value={settingsContext.settings?.id || ''}
-                        onChange={(e) => settingsContext.setActiveEventId(e.target.value)}
-                        style={{
-                            padding: '5px 10px',
-                            borderRadius: '4px',
-                            border: '1px solid #ccc',
-                            backgroundColor: '#fff',
-                            fontSize: '16px',
-                            color: '#333',
-                            outline: 'none',
-                            cursor: 'pointer'
-                        }}
-                    >
-                        {settingsContext.events.map(event => (
-                            <option key={event.id} value={event.id}>
-                                {event.eventName}
-                            </option>
-                        ))}
-                    </select>
-                )}
-            </div>
+            <h1 style={styles.headerTitle}>Mapa de Mesas</h1>
+            {settingsContext?.events && settingsContext.events.length > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '15px' }}>
+                    {settingsContext.events.map(event => (
+                        <button
+                            key={event.id}
+                            onClick={() => settingsContext.setActiveEventId(event.id)}
+                            style={{
+                                padding: '8px 16px',
+                                borderRadius: '4px',
+                                border: settingsContext.settings?.id === event.id ? '2px solid #007bff' : '1px solid #ccc',
+                                backgroundColor: settingsContext.settings?.id === event.id ? '#007bff' : '#fff',
+                                color: settingsContext.settings?.id === event.id ? '#fff' : '#333',
+                                fontSize: '16px',
+                                cursor: 'pointer',
+                                fontWeight: settingsContext.settings?.id === event.id ? 'bold' : 'normal'
+                            }}
+                        >
+                            {event.eventName}
+                        </button>
+                    ))}
+                </div>
+            )}
             <div style={styles.userInfoBar}>
                 <div style={styles.userInfo}>
                     <span>ID-Casa: <strong>{auth?.idCasa}</strong></span>
