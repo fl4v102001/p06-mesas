@@ -41,15 +41,6 @@ export const TableGrid: React.FC = () => {
         return newGrid;
     }, [wsContext?.tables, settingsContext?.settings]);
 
-    function getOffsetAbove6(coluna: number) {
-        console.log("coluna",coluna)
-        if (coluna >6 ) {
-            return 50;
-        }else {
-            return 0;
-        }
-    }
-
 
     if (!wsContext?.isConnected || settingsContext?.isLoading) return <p>A ligar ao servidor e a carregar o mapa...</p>;
     return (
@@ -58,34 +49,44 @@ export const TableGrid: React.FC = () => {
                 {grid.map((row, rowIndex) => (
                     <div key={rowIndex} style={styles.gridRow}>
                         {row.map((table, colIndex) => {
-                            if (table && table.tipo === 'aquecedor') {
-                                return <Aquecedor 
-                                    key={table._id} 
-                                    tableData={table} 
-                                    baseWidth={baseWidth}
-                                    baseHeight={baseHeight}
-                                    scaleIncrement={scaleIncrement}
-                                    svgScale={svgScale}
-                                    maxOffsetX={maxOffsetX}
-                                    maxOffsetY={maxOffsetY}
-                                />;
-                            }
-                            if (table && (table.tipo === 'mesa-4' || table.tipo === 'mesa-6')) {
-                                return <Table 
-                                    key={table._id} 
-                                    tableData={table} 
-                                    baseWidth={baseWidth}
-                                    baseHeight={baseHeight}
-                                    scaleIncrement={scaleIncrement}
-                                    svgScale={svgScale}
-                                    maxOffsetX={maxOffsetX}
-                                    maxOffsetY={maxOffsetY}
-                                />;
-                            }
-                            
                             const scaleFactor = 1 + (rowIndex * scaleIncrement);
-                            const placeholderStyle = { ...styles.tablePlaceholder, width: `${baseWidth * scaleFactor}px`, height: `${baseHeight * scaleFactor}px` };
-                            return <div key={`${rowIndex}-${colIndex}`} style={placeholderStyle}></div>;
+                            const isCorridor = colIndex === 7;
+                            
+                            let cellContent;
+
+                            if (table && table.tipo === 'aquecedor') {
+                                cellContent = <Aquecedor 
+                                    key={table._id} 
+                                    tableData={table} 
+                                    baseWidth={baseWidth}
+                                    baseHeight={baseHeight}
+                                    scaleIncrement={scaleIncrement}
+                                    svgScale={svgScale}
+                                    maxOffsetX={maxOffsetX}
+                                    maxOffsetY={maxOffsetY}
+                                />;
+                            } else if (table && (table.tipo === 'mesa-4' || table.tipo === 'mesa-6')) {
+                                cellContent = <Table 
+                                    key={table._id} 
+                                    tableData={table} 
+                                    baseWidth={baseWidth}
+                                    baseHeight={baseHeight}
+                                    scaleIncrement={scaleIncrement}
+                                    svgScale={svgScale}
+                                    maxOffsetX={maxOffsetX}
+                                    maxOffsetY={maxOffsetY}
+                                />;
+                            } else {
+                                const placeholderStyle = { ...styles.tablePlaceholder, width: `${baseWidth * scaleFactor}px`, height: `${baseHeight * scaleFactor}px` };
+                                cellContent = <div key={`${rowIndex}-${colIndex}`} style={placeholderStyle}></div>;
+                            }
+
+                            return (
+                                <React.Fragment key={`${rowIndex}-${colIndex}-wrapper`}>
+                                    {isCorridor && <div style={{ width: `${baseWidth * scaleFactor}px`, flexShrink: 0 }} />}
+                                    {cellContent}
+                                </React.Fragment>
+                            );
                         })}
                     </div>
                 ))}
