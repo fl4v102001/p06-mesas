@@ -25,7 +25,9 @@ export const TableGrid: React.FC = () => {
     const grid = useMemo(() => {
         if (!settingsContext?.settings || !wsContext?.tables) return [];
         const { mapRows, mapCols, placeholders } = settingsContext.settings;
-        const placeholderSet = new Set(placeholders.map(p => `${p.linha},${p.coluna}`));
+//        const placeholderSet = new Set(placeholders.map(p => `${p.linha},${p.coluna}`));
+//        const placeholderSet = new Set(["1,2","2,2","4,2","6,2","7,2","9,2","10,2","12,2","13,2","15,2","16,2","18,2","20,2","21,2","23,2","24,2","26,2","27,2","29,2","30,2"]);
+        const placeholderSet = new Set(); // nao é utilizado nessa interface do app, apenas na interface do usuario final no App Consistem
         const tablesMap = new Map(wsContext.tables.map(t => [`${t.linha},${t.coluna}`, t]));
         const newGrid: (TableData | null)[][] = Array(mapRows+1).fill(null).map(() => Array(mapCols+1).fill(null));
         for (let i = 0; i <= mapRows; i++) {
@@ -38,6 +40,16 @@ export const TableGrid: React.FC = () => {
         }
         return newGrid;
     }, [wsContext?.tables, settingsContext?.settings]);
+
+    function getOffsetAbove6(coluna: number) {
+        console.log("coluna",coluna)
+        if (coluna >6 ) {
+            return 50;
+        }else {
+            return 0;
+        }
+    }
+
 
     if (!wsContext?.isConnected || settingsContext?.isLoading) return <p>A ligar ao servidor e a carregar o mapa...</p>;
     return (
