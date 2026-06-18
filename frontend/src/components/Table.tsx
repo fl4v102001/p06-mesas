@@ -71,6 +71,20 @@ export const Table: React.FC<TableProps> = ({ tableData, baseWidth, baseHeight, 
                 onMouseMove={handleMouseMove}
             >
                 <svg style={svgStyle} preserveAspectRatio="none"><use href={svgMesa} /></svg>
+                {tableData.tipo === 'mesa-6' && (
+                    <img 
+                        src="/wheelchair-svgrepo-com.svg" 
+                        alt="Acessível"
+                        style={{
+                            position: 'absolute',
+                            width: `${cellWidth * 0.40}px`,
+                            height: `${cellHeight * 0.40}px`,
+                            top: `calc(-10% + ${randomOffset.y}px)`,
+                            left: `calc(-00% + ${randomOffset.x}px)`,
+                            pointerEvents: 'none'
+                        }} 
+                    />
+                )}
                 {tableData.tipo && <span style={textStyle}>{tableData.ownerId}</span>}
             </div>
             <Tooltip
