@@ -4,11 +4,11 @@
 // -----------------------------------------------------------------------------
 import { API_URL } from '../constants';
 
-export const loginUser = async (idCasa: string) => {
+export const loginUser = async (idCasa: string, Chave: string) => {
     const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idCasa }),
+        body: JSON.stringify({ idCasa, Chave }),
     });
     if (!response.ok) {
         const data = await response.json();

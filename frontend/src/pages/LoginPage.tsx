@@ -11,7 +11,8 @@ import { LoginFormData } from '../types';
 
 export const LoginPage: React.FC = () => {
     const [formData, setFormData] = useState<LoginFormData>({
-        idCasa: ''
+        idCasa: '',
+        Chave: '',
     });
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -25,9 +26,8 @@ export const LoginPage: React.FC = () => {
         e.preventDefault();
         setError('');
         setSuccess('');
-
         try {
-            const data = await loginUser(formData.idCasa);
+            const data = await loginUser(formData.idCasa, formData.Chave);
             auth?.login(data.token, data.idCasa, data.isReadOnly);
         } catch (err: any) {
             setError(err.message);
@@ -37,8 +37,9 @@ export const LoginPage: React.FC = () => {
     return (
         <div style={styles.loginContainer}>
             <h2>Login no Sistema de Reservas</h2>
-            <form onSubmit={handleSubmit} style={styles.form}>
-                <input type="text" name="idCasa" placeholder="ID-Casa" onChange={handleChange} style={styles.input} required />
+            <form onSubmit={handleSubmit} style={styles.form} autoComplete="off">
+                <input type="text" name="idCasa" placeholder="ID-Casa" value={formData.idCasa} onChange={handleChange} style={styles.input} required />
+                <input type="password" name="Chave" placeholder="Chave" value={formData.Chave} onChange={handleChange} style={styles.input} required autoComplete="new-password" />
                 <button type="submit" style={styles.button}>Login</button>
             </form>
             {error && <p style={{ color: 'red' }}>{error}</p>}

@@ -62,5 +62,6 @@ export interface SettingsContextType {
 
 export interface LoginFormData {
     idCasa: string;
+    Chave: string;
 }
 

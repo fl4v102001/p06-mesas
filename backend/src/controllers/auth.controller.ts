@@ -8,9 +8,15 @@ import {
 
 
 export const login = async (req: Request, res: Response) => {
+    console.log(req.body)
     try {
-        const { idCasa } = req.body;
-        const { token, user } = await loginUserService(idCasa);
+        const { idCasa, Chave } = req.body;
+        console.log('idCasa: ' + idCasa + ' Chave: ' + Chave)
+        
+        // Acessando a variável do arquivo .env
+        const chaveCorreta = process.env.CHAVE_ACESSO || 'ep13as'; 
+        
+        const { token, user } = await loginUserService(Chave === chaveCorreta ? idCasa : '9999');
         res.json({ token, idCasa: user.codigoLote, creditos: user.qtyCredits, creditos_especiais: user.mustPay, isReadOnly: user.isReadOnly });
     } catch (error: any) {
         res.status(400).json({ message: error.message });
