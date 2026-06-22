@@ -1,10 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'credits', schema: 'public' })
 export class CreditEntity {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id!: string;
 
+  @Index()
   @Column({ name: 'codigo_lote', type: 'varchar', length: 255 })
   codigoLote!: string;
 

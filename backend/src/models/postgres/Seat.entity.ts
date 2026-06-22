@@ -1,5 +1,6 @@
 import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
+@Index(['idEvent', 'linha', 'coluna'])
 @Entity({ name: 'seats', schema: 'public' })
 export class SeatEntity {
   @PrimaryGeneratedColumn({ type: 'bigint' })

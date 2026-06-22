@@ -122,9 +122,15 @@ export const handleTableClickService = async (user_idCasa: string, linha: number
             credit.mustPay += 1; // Devolve 1 crédito especial
         }
 
-        // Salva as alterações no banco de dados
-        await transactionalEntityManager.save(credit);
-        await transactionalEntityManager.save(seat);
+        // Salva as alterações no banco de dados usando update em vez de save para melhor performance
+        await transactionalEntityManager.update(CreditEntity, credit.id, {
+            mustPay: credit.mustPay,
+            qtyCredits: credit.qtyCredits
+        });
+        await transactionalEntityManager.update(SeatEntity, seat.id, {
+            status: seat.status,
+            ownerId: seat.ownerId
+        });
     });
 };
 
