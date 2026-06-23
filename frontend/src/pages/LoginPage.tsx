@@ -38,7 +38,11 @@ export const LoginPage: React.FC = () => {
         <div style={styles.loginContainer}>
             <h2>Login no Sistema de Reservas</h2>
             <form onSubmit={handleSubmit} style={styles.form} autoComplete="off">
-                <input type="text" name="idCasa" placeholder="ID-Casa" value={formData.idCasa} onChange={handleChange} style={styles.input} required />
+                {/* Campos ocultos para enganar o gerenciador de senhas do navegador e evitar o prompt de salvar */}
+                <input type="text" name="fakeusernameremembered" style={{ display: 'none' }} tabIndex={-1} aria-hidden="true" />
+                <input type="password" name="fakepasswordremembered" style={{ display: 'none' }} tabIndex={-1} aria-hidden="true" />
+
+                <input type="text" name="idCasa" placeholder="ID-Casa" value={formData.idCasa} onChange={handleChange} style={styles.input} required autoComplete="nope" />
                 <input type="password" name="Chave" placeholder="Chave" value={formData.Chave} onChange={handleChange} style={styles.input} required autoComplete="new-password" />
                 <button type="submit" style={styles.button}>Login</button>
             </form>
