@@ -93,11 +93,11 @@ const MapPageContent: React.FC = () => {
         <div style={styles.mapPage}>
             <SvgSpriteLoader url="/mesa-svg.html" />
             <div style={styles.mainContentContainer}>
-                {!isMobileOrTablet && <LeftInfoPanel />}
+                {<LeftInfoPanel />}
                 <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
                     <TableGrid isRotated={isRotated} />
                 </div>
-                {!isMobileOrTablet && <RightInfoPanel
+                {<RightInfoPanel
                     onBuyClick={handleBuyClick}
                     onRotateClick={() => setIsRotated(!isRotated)}
                     onLogoutClick={handleLogoutRequest}
