@@ -49,7 +49,7 @@ export const styles: { [key: string]: React.CSSProperties } = {
         overflow: 'hidden', // Previne que o container principal tenha scroll
     },
     sideColumn: { // Estilo para as colunas laterais
-        width: '15%',
+        width: '10%',
         padding: '20px',
         borderLeft: '1px solid #ccc',
         borderRight: '1px solid #ccc',
