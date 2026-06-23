@@ -11,18 +11,18 @@ interface AquecedorProps {
     tableData: TableData;
     baseWidth: number;
     baseHeight: number;
-    scaleIncrement: number;
+    scaleFactor: number;
     svgScale: number;
     maxOffsetX: number;
     maxOffsetY: number;
 }
 
-export const Aquecedor: React.FC<AquecedorProps> = ({ tableData, baseWidth, baseHeight, scaleIncrement, svgScale, maxOffsetX, maxOffsetY }) => {
+export const Aquecedor: React.FC<AquecedorProps> = ({ tableData, baseWidth, baseHeight, scaleFactor, svgScale, maxOffsetX, maxOffsetY }) => {
     const [tooltipVisible, setTooltipVisible] = useState(false);
     const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
 
     const randomOffset = useMemo(() => ({ x: Math.random() * maxOffsetX, y: Math.random() * maxOffsetY }), [maxOffsetX, maxOffsetY]);
-    const scaleFactor = 1 + (tableData.linha * scaleIncrement);
+    
     const cellWidth = baseWidth * scaleFactor;
     const cellHeight = baseHeight * scaleFactor;
     const svgWidth = cellWidth * svgScale;

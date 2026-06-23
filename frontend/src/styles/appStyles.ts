@@ -46,7 +46,7 @@ export const styles: { [key: string]: React.CSSProperties } = {
     mainContentContainer: { // Novo container para o layout de 3 colunas
         display: 'flex',
         flexGrow: 1,
-        overflow: 'hidden', // Previne que o container principal tenha scroll
+        overflow: 'auto', // Permite que o container principal tenha scroll se o conteúdo exceder
     },
     sideColumn: { // Estilo para as colunas laterais
         width: '10%',

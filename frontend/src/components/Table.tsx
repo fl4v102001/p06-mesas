@@ -14,13 +14,13 @@ interface TableProps {
     tableData: TableData;
     baseWidth: number;
     baseHeight: number;
-    scaleIncrement: number;
+    scaleFactor: number;
     svgScale: number;
     maxOffsetX: number;
     maxOffsetY: number;
 }
 
-export const Table: React.FC<TableProps> = ({ tableData, baseWidth, baseHeight, scaleIncrement, svgScale, maxOffsetX, maxOffsetY }) => {
+export const Table: React.FC<TableProps> = ({ tableData, baseWidth, baseHeight, scaleFactor, svgScale, maxOffsetX, maxOffsetY }) => {
     const auth = useContext(AuthContext);
     const wsContext = useContext(WebSocketContext);
     const settingsContext = useContext(SettingsContext);
@@ -29,7 +29,7 @@ export const Table: React.FC<TableProps> = ({ tableData, baseWidth, baseHeight, 
     const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
 
     const randomOffset = useMemo(() => ({ x: (Math.random() - 0.5) * maxOffsetX, y: (Math.random() - 0.5) * maxOffsetY }), [maxOffsetX, maxOffsetY]);
-    const scaleFactor = 1 + (tableData.linha * scaleIncrement);
+    
     const cellWidth = baseWidth * scaleFactor;
     const cellHeight = baseHeight * scaleFactor;
     const svgWidth = cellWidth * svgScale;

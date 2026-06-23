@@ -19,6 +19,7 @@ const MapPageContent: React.FC = () => {
     const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
     const [purchaseDetails, setPurchaseDetails] = useState({ count: 0, total: 0 });
     const [isMobileOrTablet, setIsMobileOrTablet] = useState(window.innerWidth <= 1024);
+    const [isRotated, setIsRotated] = useState(false);
     
     const auth = useContext(AuthContext);
     const wsContext = useContext(WebSocketContext);
@@ -95,7 +96,10 @@ const MapPageContent: React.FC = () => {
             <Header onLogoutClick={handleLogoutRequest} onBuyClick={handleBuyClick} />
             <div style={styles.mainContentContainer}>
                 {!isMobileOrTablet && <LeftInfoPanel />}
-                <TableGrid />
+                <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                    <button onClick={() => setIsRotated(!isRotated)} style={{...styles.button, alignSelf: 'center', marginTop: '10px'}}>Rotacionar</button>
+                    <TableGrid isRotated={isRotated} />
+                </div>
                 {!isMobileOrTablet && <RightInfoPanel />}
             </div>
             <ConfirmationModal
