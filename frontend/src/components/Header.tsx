@@ -10,16 +10,17 @@ import { styles } from '../styles/appStyles';
 interface HeaderProps {
     onLogoutClick: () => void;
     onBuyClick: () => void;
+    onRotateClick: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onLogoutClick, onBuyClick }) => {
+export const Header: React.FC<HeaderProps> = ({ onLogoutClick, onBuyClick, onRotateClick }) => {
     const auth = useContext(AuthContext);
     const wsContext = useContext(WebSocketContext);
     const settingsContext = useContext(SettingsContext);
 
     return (
         <header style={styles.header}>
-            <h1 style={styles.headerTitle}>Mapa de Mesas</h1>
+            {/* <h1 style={styles.headerTitle}>Mapa de Mesas</h1> */}
             <div style={styles.userInfoBar}>
                 <div style={styles.userInfo}>
                     <span>ID-Casa: <strong>{auth?.idCasa}</strong></span>
@@ -56,7 +57,10 @@ export const Header: React.FC<HeaderProps> = ({ onLogoutClick, onBuyClick }) => 
                 <div style={styles.userActions}>
                     <button style={styles.configButton} hidden={true}>Config</button>
                     {!auth?.isReadOnly && (
-                        <button onClick={onBuyClick} style={styles.buyButton}>Comprar</button>
+                        <>
+                            <button onClick={onBuyClick} style={styles.buyButton}>Comprar</button>
+                            <button onClick={onRotateClick} style={styles.button}>Rotacionar</button>
+                        </>
                     )}
                     <button onClick={onLogoutClick} style={styles.logoutButton}>Logout</button>
                 </div>
