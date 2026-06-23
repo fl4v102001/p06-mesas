@@ -1,14 +1,31 @@
 // -----------------------------------------------------------------------------
 // Arquivo: src/components/RightInfoPanel.tsx (NOVO)
 // -----------------------------------------------------------------------------
-import React from 'react';
+import React, { useContext } from 'react';
+import { AuthContext } from '../contexts/AuthContext';
 import { styles } from '../styles/appStyles';
 
-export const RightInfoPanel: React.FC = () => {
+interface RightInfoPanelProps {
+    onBuyClick: () => void;
+    onRotateClick: () => void;
+    onLogoutClick: () => void;
+}
+
+export const RightInfoPanel: React.FC<RightInfoPanelProps> = ({ onBuyClick, onRotateClick, onLogoutClick }) => {
+    const auth = useContext(AuthContext);
+
     return (
         <div style={styles.sideColumn}>
-            <h2>Painel Direito</h2>
-            <p>Este é o painel lateral direito. Ideal para detalhes, filtros ou outras informações contextuais.</p>
+            <h3 style={{ marginTop: 0 }}>Ações</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {!auth?.isReadOnly && (
+                    <>
+                        <button onClick={onRotateClick} style={styles.button}>Rotacionar</button>
+                        <button onClick={onBuyClick} style={styles.buyButton}>Comprar</button>
+                    </>
+                )}
+                <button onClick={onLogoutClick} style={styles.logoutButton}>Trocar Casa</button>
+            </div>
         </div>
     );
 };

@@ -3,7 +3,6 @@
 // -----------------------------------------------------------------------------
 import React, { useState, useContext, useEffect } from 'react';
 import { WebSocketProvider, WebSocketContext } from '../contexts/WebSocketContext';
-import { Header } from '../components/Header';
 import { TableGrid } from '../components/TableGrid';
 import { ConfirmationModal } from '../components/ConfirmationModal';
 import { LeftInfoPanel } from '../components/LeftInfoPanel';
@@ -93,13 +92,16 @@ const MapPageContent: React.FC = () => {
     return (
         <div style={styles.mapPage}>
             <SvgSpriteLoader url="/mesa-svg.html" />
-            <Header onLogoutClick={handleLogoutRequest} onBuyClick={handleBuyClick} onRotateClick={() => setIsRotated(!isRotated)} />
             <div style={styles.mainContentContainer}>
                 {!isMobileOrTablet && <LeftInfoPanel />}
                 <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
                     <TableGrid isRotated={isRotated} />
                 </div>
-                {!isMobileOrTablet && <RightInfoPanel />}
+                {!isMobileOrTablet && <RightInfoPanel
+                    onBuyClick={handleBuyClick}
+                    onRotateClick={() => setIsRotated(!isRotated)}
+                    onLogoutClick={handleLogoutRequest}
+                />}
             </div>
             <ConfirmationModal
                 isOpen={isLogoutModalOpen}
