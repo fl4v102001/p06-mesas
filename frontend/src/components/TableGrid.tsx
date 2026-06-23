@@ -17,6 +17,9 @@ export const TableGrid: React.FC<TableGridProps> = ({ isRotated }) => {
     const wsContext = useContext(WebSocketContext);
     const settingsContext = useContext(SettingsContext);
 
+    // The corridor is placed *after* the column with this index.
+    const CORRIDOR_AFTER_COLUMN_INDEX = 7;
+
     const { 
         baseWidth = 55, 
         baseHeight = 60, 
@@ -105,28 +108,49 @@ export const TableGrid: React.FC<TableGridProps> = ({ isRotated }) => {
             return <div key={key} style={placeholderStyle}></div>;
         }
     };
+    
+    // Calculate the correct corridor index for the rotated view.
+    // The number of columns in the original grid determines the number of rows in the transposed grid.
+    const numOriginalCols = grid[0]?.length || 0;
+    // After transposing and reversing, the original column's new row index is calculated.
+    const rotatedCorridorIndex = numOriginalCols > 0 ? (numOriginalCols - 1) - CORRIDOR_AFTER_COLUMN_INDEX : -1;
 
     return (
         <div style={styles.gridContainer}>
             <div style={gridContentWrapperStyle}>
-                {displayGrid.map((row, rowIndex) => (
-                    <div key={`row-${rowIndex}`} style={gridRowStyle}>
-                        {row.map((table, colIndex) => {
-                            const scaleFactor = 1 + (rowIndex * scaleIncrement);
-                            // When rotated, the corridor that was vertical (col 7) becomes horizontal (row 7).
-                            // The rendering logic is now unified, so we check the index based on rotation.
-                            const isCorridor = isRotated ? rowIndex === 7 : colIndex === 7;
-                            const cellContent = renderCell(table, scaleFactor, `${rowIndex}-${colIndex}`);
-                            
-                            return (
-                                <React.Fragment key={`${rowIndex}-${colIndex}-wrapper`}>
-                                    {isCorridor && <div style={{ width: `${baseWidth * scaleFactor}px`, flexShrink: 0 }} />}
-                                    {cellContent}
-                                </React.Fragment>
-                            );
-                        })}
-                    </div>
-                ))}
+                {displayGrid.map((row, rowIndex) => {
+                    const scaleFactor = 1 + (rowIndex * scaleIncrement);
+                    const isRotatedCorridorRow = isRotated && rowIndex === rotatedCorridorIndex;
+
+                    const rowContent = (
+                        <div key={`row-${rowIndex}`} style={gridRowStyle}>
+                            {row.map((table, colIndex) => {
+                                // For the normal view, the corridor is a vertical spacer between cells.
+                                const isVerticalCorridor = !isRotated && colIndex === CORRIDOR_AFTER_COLUMN_INDEX - 1;
+                                const cellContent = renderCell(table, scaleFactor, `${rowIndex}-${colIndex}`);
+                                
+                                return (
+                                    <React.Fragment key={`${rowIndex}-${colIndex}-wrapper`}>
+                                        {cellContent}
+                                        {isVerticalCorridor && <div style={{ width: `${baseWidth * scaleFactor}px`, flexShrink: 0 }} />}
+                                    </React.Fragment>
+                                );
+                            })}
+                        </div>
+                    );
+
+                    if (isRotatedCorridorRow) {
+                        // For the rotated view, add a horizontal spacer after the row content.
+                        return (
+                            <React.Fragment key={`rotated-corridor-wrapper-${rowIndex}`}>
+                                {rowContent}
+                                <div style={{ height: `${baseHeight * scaleFactor}px`, width: '100%' }} />
+                            </React.Fragment>
+                        );
+                    }
+
+                    return rowContent;
+                })}
             </div>
         </div>
     );
