@@ -20,10 +20,10 @@ export const RightInfoPanel: React.FC<RightInfoPanelProps> = ({ onBuyClick, onRo
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {!auth?.isReadOnly && (
                     <>
-                        <button onClick={onRotateClick} style={styles.button}>Rotacionar</button>
                         <button onClick={onBuyClick} style={styles.buyButton}>Comprar</button>
                     </>
                 )}
+                <button onClick={onRotateClick} style={styles.button}>Rotacionar</button>
                 <button onClick={onLogoutClick} style={styles.logoutButton}>Trocar Casa</button>
             </div>
         </div>

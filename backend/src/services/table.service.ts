@@ -85,6 +85,9 @@ export const handleTableClickService = async (user_idCasa: string, linha: number
         const credit = await transactionalEntityManager.findOne(CreditEntity, { where: { codigoLote: user_idCasa } });
         const seat = await transactionalEntityManager.findOne(SeatEntity, { where: { linha, coluna, idEvent: eventId } });
 
+        // // Delay de 3 segundos para teste do feedback visual
+        // await new Promise(resolve => setTimeout(resolve, 3000));
+
         if (!credit || !seat) {
             throw new Error("Usuário (Crédito) ou mesa não encontrados.");
         }

@@ -2,7 +2,7 @@
 // -----------------------------------------------------------------------------
 // Arquivo: src/components/Table.tsx (MODIFICADO)
 // -----------------------------------------------------------------------------
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState, useEffect, useRef } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { WebSocketContext } from '../contexts/WebSocketContext';
 import { SettingsContext } from '../contexts/SettingsContext';
@@ -27,6 +27,8 @@ export const Table: React.FC<TableProps> = ({ tableData, baseWidth, baseHeight, 
     
     const [tooltipVisible, setTooltipVisible] = useState(false);
     const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+    const [isProcessing, setIsProcessing] = useState(false);
+    const processingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const randomOffset = useMemo(() => ({ x: (Math.random() - 0.5) * maxOffsetX, y: (Math.random() - 0.5) * maxOffsetY }), [maxOffsetX, maxOffsetY]);
     
@@ -40,13 +42,29 @@ export const Table: React.FC<TableProps> = ({ tableData, baseWidth, baseHeight, 
     };
 
     const handleClick = () => { 
-        if (isClickable) {
+        if (isClickable && !isProcessing) {
             const eventId = settingsContext?.settings?.id;
             if (eventId) {
+                setIsProcessing(true);
                 wsContext?.sendMessage({ type: 'cliqueMesa', payload: { linha: tableData.linha, coluna: tableData.coluna, eventId } }); 
+                
+                if (processingTimeoutRef.current) clearTimeout(processingTimeoutRef.current);
+                processingTimeoutRef.current = setTimeout(() => {
+                    setIsProcessing(false);
+                }, 5000);
             }
         }
     };
+
+    useEffect(() => {
+        if (isProcessing) {
+            setIsProcessing(false);
+            if (processingTimeoutRef.current) {
+                clearTimeout(processingTimeoutRef.current);
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [tableData.status, tableData.ownerId]);
     const getTableColor = (): string => {
         const { status, tipo, ownerId } = tableData;
         if (status === 'selecionada') return ownerId === auth?.idCasa ? (tipo === 'mesa-4' ? '#ADD8E6' : '#ADD8E6') : (tipo === 'mesa-6' ? '#fafa8bff' : '#FFD700');
@@ -70,7 +88,7 @@ export const Table: React.FC<TableProps> = ({ tableData, baseWidth, baseHeight, 
                 onMouseLeave={() => setTooltipVisible(false)}
                 onMouseMove={handleMouseMove}
             >
-                <svg style={svgStyle} preserveAspectRatio="none"><use href={svgMesa} /></svg>
+                <svg className={isProcessing ? 'pulse-animation' : ''} style={svgStyle} preserveAspectRatio="none"><use href={svgMesa} /></svg>
                 {tableData.tipo === 'mesa-6' && (
                     <img 
                         src="/wheelchair-svgrepo-com.svg" 
