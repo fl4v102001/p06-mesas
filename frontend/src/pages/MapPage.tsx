@@ -19,6 +19,7 @@ const MapPageContent: React.FC = () => {
     const [purchaseDetails, setPurchaseDetails] = useState({ count: 0, total: 0 });
     const [isMobileOrTablet, setIsMobileOrTablet] = useState(window.innerWidth <= 1024);
     const [isRotated, setIsRotated] = useState(false);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
     
     const auth = useContext(AuthContext);
     const wsContext = useContext(WebSocketContext);
@@ -30,7 +31,7 @@ const MapPageContent: React.FC = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const handleLogoutRequest = () => {
+    const handleLogoutRequest = async () => {
         if (!auth || !wsContext) return;
 
         const userSelectedTables = wsContext.tables.filter(
@@ -38,15 +39,25 @@ const MapPageContent: React.FC = () => {
         );
 
         if (userSelectedTables.length === 0) {
-            auth.logout();
+            setIsLoggingOut(true);
+            try {
+                await auth.logout();
+            } finally {
+                setIsLoggingOut(false);
+            }
         } else {
             setIsLogoutModalOpen(true);
         }
     };
 
     const handleConfirmLogout = async () => {
-        if (auth) await auth.logout();
         setIsLogoutModalOpen(false);
+        setIsLoggingOut(true);
+        try {
+            if (auth) await auth.logout();
+        } finally {
+            setIsLoggingOut(false);
+        }
     };
 
     const handleBuyClick = () => {
@@ -91,17 +102,49 @@ const MapPageContent: React.FC = () => {
 
     return (
         <div style={styles.mapPage}>
+            {isLoggingOut && (
+                <div style={{
+                    position: 'absolute',
+                    top: 0, left: 0, right: 0, bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                    zIndex: 9999,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    color: '#fff',
+                    fontFamily: 'sans-serif'
+                }}>
+                    <div style={{
+                        border: '4px solid rgba(255, 255, 255, 0.3)',
+                        borderTop: '4px solid #fff',
+                        borderRadius: '50%',
+                        width: '40px',
+                        height: '40px',
+                        animation: 'spin 1s linear infinite',
+                        marginBottom: '16px'
+                    }} />
+                    <style>{`
+                        @keyframes spin {
+                            0% { transform: rotate(0deg); }
+                            100% { transform: rotate(360deg); }
+                        }
+                    `}</style>
+                    <h2>Saindo...</h2>
+                    <p>Por favor, aguarde.</p>
+                </div>
+            )}
             <SvgSpriteLoader url="/mesa-svg.html" />
             <div style={styles.mainContentContainer}>
-                {<LeftInfoPanel />}
+                <LeftInfoPanel />
                 <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
                     <TableGrid isRotated={isRotated} />
                 </div>
-                {<RightInfoPanel
+                <RightInfoPanel
                     onBuyClick={handleBuyClick}
                     onRotateClick={() => setIsRotated(!isRotated)}
                     onLogoutClick={handleLogoutRequest}
-                />}
+                />
             </div>
             <ConfirmationModal
                 isOpen={isLogoutModalOpen}
