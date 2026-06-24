@@ -47,6 +47,17 @@ export interface EventStatus {
     percentual_disponivel: number;
 }
 
+export interface EventSeatsReportItem {
+    owner_codigo_lote: string;
+    qtd: number;
+    seat_name: string[];
+}
+
+export interface EventSeatsReport {
+    event_name: string;
+    items: EventSeatsReportItem[];
+}
+
 export interface AuthContextType {
     token: string | null;
     idCasa: string | null;
