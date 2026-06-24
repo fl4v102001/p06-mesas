@@ -9,7 +9,7 @@ dotenv.config();
 export const AppDataSource = new DataSource({
     type: 'postgres',
     url: process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/table_reservation',
-    synchronize: true, // TODO: Consider changing to false for production
+    synchronize: false, // TODO: Consider changing to false for production
     logging: false,
     entities: [EventEntity, SeatEntity, CreditEntity],
     subscribers: [],
