@@ -47,6 +47,21 @@ export class EventEntity {
   @Column({ name: 'svg_url', type: 'varchar', length: 255 })
   svgUrl!: string;
 
+  @Column({ name: 'color_free', type: 'varchar', length: 255, default: "#ffffffff", nullable: true })
+  colorFree!: string | null;
+
+  @Column({ name: 'color_occupied', type: 'varchar', length: 255, default: "#c2c8d1b6", nullable: true })
+  colorOccupied!: string | null;
+
+  @Column({ name: 'color_purchased', type: 'varchar', length: 255, default: "#87ff66e1", nullable: true })
+  colorPurchased!: string | null;
+
+  @Column({ name: 'color_reserved', type: 'varchar', length: 255, default: "#ff8282e1", nullable: true })
+  colorReserved!: string | null;
+
+  @Column({ name: 'color_selected', type: 'varchar', length: 255, default: "#00ff08ed", nullable: true })
+  colorSelected!: string | null;
+
 
 }
  
