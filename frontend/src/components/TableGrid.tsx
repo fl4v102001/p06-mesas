@@ -1,10 +1,12 @@
 // -----------------------------------------------------------------------------
 // Arquivo: src/components/TableGrid.tsx (MODIFICADO)
 // -----------------------------------------------------------------------------
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useMemo, useState, useEffect } from 'react';
 import { WebSocketContext } from '../contexts/WebSocketContext';
 import { SettingsContext } from '../contexts/SettingsContext';
-import { TableData } from '../types';
+import { AuthContext } from '../contexts/AuthContext';
+import { TableData, EventStatus } from '../types';
+import { getEventStatus } from '../api/eventService';
 import { Table } from './Table';
 import { styles } from '../styles/appStyles';
 import { Aquecedor } from './Aquecedor';
@@ -16,6 +18,7 @@ interface TableGridProps {
 export const TableGrid: React.FC<TableGridProps> = ({ isRotated }) => {
     const wsContext = useContext(WebSocketContext);
     const settingsContext = useContext(SettingsContext);
+    const auth = useContext(AuthContext);
 
     // The corridor is placed *after* the column with this index.
     const CORRIDOR_AFTER_COLUMN_INDEX = 7;
@@ -28,6 +31,36 @@ export const TableGrid: React.FC<TableGridProps> = ({ isRotated }) => {
         maxOffsetX = 10, 
         maxOffsetY = 10 
     } = settingsContext?.settings || {};
+
+    const [eventStatus, setEventStatus] = useState<EventStatus | null>(null);
+    const [eventStatusLoading, setEventStatusLoading] = useState(false);
+    const [eventStatusError, setEventStatusError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchEventStatus = async () => {
+            if (!auth?.token || !settingsContext?.settings?.id) {
+                setEventStatus(null);
+                setEventStatusError(null);
+                return;
+            }
+
+            setEventStatusLoading(true);
+            setEventStatusError(null);
+
+            try {
+                const status = await getEventStatus(auth.token, settingsContext.settings.id);
+                setEventStatus(status);
+            } catch (error: any) {
+                console.error('Erro ao buscar status do evento:', error);
+                setEventStatus(null);
+                setEventStatusError(error?.message || 'Erro ao carregar status do evento.');
+            } finally {
+                setEventStatusLoading(false);
+            }
+        };
+
+        fetchEventStatus();
+    }, [auth?.token, settingsContext?.settings?.id]);
 
     const grid = useMemo(() => {
         if (!settingsContext?.settings || !wsContext?.tables) return [];
@@ -115,9 +148,45 @@ export const TableGrid: React.FC<TableGridProps> = ({ isRotated }) => {
     // After transposing and reversing, the original column's new row index is calculated.
     const rotatedCorridorIndex = numOriginalCols > 0 ? (numOriginalCols - 1) - CORRIDOR_AFTER_COLUMN_INDEX : -1;
 
+    const eventStatusBoxStyle: React.CSSProperties = {
+        position: 'absolute',
+        top: 12,
+        left: 12,
+        padding: '10px 12px',
+        backgroundColor: '#fff',
+        borderRadius: '10px',
+        boxShadow: '0 3px 12px rgba(0,0,0,0.16)',
+        width: 'auto',
+        minWidth: 0,
+        zIndex: 20,
+        textAlign: 'left',
+        whiteSpace: 'nowrap',
+    };
+
+
+    const eventStatusLabelStyle: React.CSSProperties = { margin: 0, fontWeight: 700, fontSize: '0.95rem', color: '#333' };
+    const eventStatusValueStyle: React.CSSProperties = { margin: '4px 0', color: '#444' };
+
     return (
-        <div style={styles.gridContainer}>
+        <div style={{ ...styles.gridContainer, position: 'relative' }}>
             <div style={gridContentWrapperStyle}>
+                <div style={eventStatusBoxStyle}>
+                    <p style={eventStatusLabelStyle}>Status do evento</p>
+                    {eventStatusLoading && <p style={eventStatusValueStyle}>A carregar status...</p>}
+                    {eventStatusError && <p style={{ ...eventStatusValueStyle, color: '#c00' }}>{eventStatusError}</p>}
+                    {!eventStatusLoading && !eventStatusError && eventStatus && (
+                        <>
+                            <p style={eventStatusValueStyle}><strong>Total mesas:</strong> {eventStatus.total_mesas}</p>
+                            <p style={eventStatusValueStyle}><strong>Total comprado:</strong> {eventStatus.total_comprado}</p>
+                            <p style={eventStatusValueStyle}><strong>Total disponível:</strong> {eventStatus.total_disponivel}</p>
+                            <p style={eventStatusValueStyle}><strong>% comprado:</strong> {eventStatus.percentual_comprado}%</p>
+                            <p style={eventStatusValueStyle}><strong>% disponível:</strong> {eventStatus.percentual_disponivel}%</p>
+                        </>
+                    )}
+                    {!eventStatusLoading && !eventStatusError && !eventStatus && (
+                        <p style={eventStatusValueStyle}>Status não disponível.</p>
+                    )}
+                </div>
                 {displayGrid.map((row, rowIndex) => {
                     const scaleFactor = 1 + (rowIndex * scaleIncrement);
                     const isRotatedCorridorRow = isRotated && rowIndex === rotatedCorridorIndex;

@@ -1,8 +1,10 @@
 import { Router } from 'express';
-import { getActiveEvents } from '../controllers/event.controller';
+import { getActiveEvents, getEventStatusController } from '../controllers/event.controller';
+import { authMiddleware } from '../middleware/auth.middleware';
 
 const router = Router();
 
 router.get('/', getActiveEvents);
+router.get('/:id/status', authMiddleware, getEventStatusController);
 
 export default router;

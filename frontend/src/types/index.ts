@@ -38,6 +38,15 @@ export interface ISettings {
     svgUrl: string;
 }
 
+export interface EventStatus {
+    id_event: number;
+    total_mesas: number;
+    total_comprado: number;
+    total_disponivel: number;
+    percentual_comprado: number;
+    percentual_disponivel: number;
+}
+
 export interface AuthContextType {
     token: string | null;
     idCasa: string | null;
