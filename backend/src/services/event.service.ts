@@ -89,31 +89,36 @@ export const getEventSeatsReport = async (id_event: number): Promise<EventSeatsR
       )
       ORDER BY event_name
     ), '[]'::json) AS result
-    FROM (
-      SELECT
-        event_name,
-        json_agg(
-          json_build_object(
-            'owner_codigo_lote', owner_codigo_lote,
-            'qtd', qtd,
-            'seat_name', seat_names
-          )
-          ORDER BY owner_codigo_lote::int
-        ) AS items
-      FROM (
-        SELECT
-          e.name AS event_name,
-          s.owner_codigo_lote,
-          count(*) AS qtd,
-          array_agg(s.seat_name ORDER BY s.seat_name) AS seat_names
-        FROM events e
-        JOIN seats s ON e.id = s.id_event
-        WHERE s.owner_codigo_lote IS NOT NULL
-          AND e.id = $1
-        GROUP BY e.name, s.owner_codigo_lote
-      ) g
-      GROUP BY event_name
-    ) t;
+from (
+  select
+    event_name,
+    json_agg(
+      json_build_object(
+        'owner_codigo_lote', owner_codigo_lote,
+        'qtd', qtd,
+        'total', total,
+        'seat_name', seat_names
+      )
+      order by owner_codigo_lote::int
+    ) as items
+  from (
+    select
+      e.name as event_name,
+      s.owner_codigo_lote,
+      count(*) as qtd,
+      sum(s.price) as total,
+      json_agg(
+        json_build_object(s.seat_name, s.price)
+        order by s.seat_name
+      ) as seat_names
+    from events e
+    join seats s on e.id = s.id_event
+    where s.owner_codigo_lote is not null
+      and s.id_event = $1
+    group by e.name, s.owner_codigo_lote
+  ) g
+  group by event_name
+) t;
   `;
 
   const result = await AppDataSource.manager.query(sql, [id_event]);
