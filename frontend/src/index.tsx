@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import { PrintReportPage } from './pages/PrintReportPage';
+import { PrintConsolidatedReportPage } from './pages/PrintConsolidatedReportPage';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(
@@ -16,6 +17,12 @@ if (path.startsWith('/print-report/')) {
   root.render(
     <React.StrictMode>
       <PrintReportPage eventId={eventId} />
+    </React.StrictMode>
+  );
+} else if (path.startsWith('/print-consolidated-report')) {
+  root.render(
+    <React.StrictMode>
+      <PrintConsolidatedReportPage />
     </React.StrictMode>
   );
 } else {

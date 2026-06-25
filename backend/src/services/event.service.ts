@@ -1,4 +1,5 @@
 import { AppDataSource } from '../config/data-source';
+import { SeatEntity } from '../models/postgres/Seat.entity';
 
 export interface EventStatus {
   id_event: number;
@@ -18,6 +19,11 @@ export interface EventSeatsReportItem {
 export interface EventSeatsReport {
   event_name: string;
   items: EventSeatsReportItem[];
+}
+
+export interface ConsolidatedSeatsReport {
+  owner_codigo_lote: string;
+  seat_name: string;
 }
 
 export const getEventStatus = async (id_event: number): Promise<EventStatus> => {
@@ -128,4 +134,21 @@ from (
   }
 
   return result[0].result || [];
+};
+
+
+
+export const getConsolidatedSeatsReport = async (): Promise<ConsolidatedSeatsReport[]> => {
+  const result = await AppDataSource.getRepository(SeatEntity)
+    .createQueryBuilder('s')
+    .select('s.owner_codigo_lote', 'owner_codigo_lote')
+    .addSelect('s.seat_name', 'seat_name')
+    .orderBy('s.owner_codigo_lote::int', 'ASC')
+    .getRawMany();
+
+  if (!result || result.length === 0) {
+    return [];
+  }
+
+  return result as ConsolidatedSeatsReport[];
 };

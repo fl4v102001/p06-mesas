@@ -1,5 +1,5 @@
 import { API_URL } from '../constants';
-import { ISettings, EventStatus, EventSeatsReport } from '../types';
+import { ISettings, EventStatus, EventSeatsReport, ConsolidatedSeatsReport } from '../types';
 
 export const getActiveEvents = async (): Promise<ISettings[]> => {
     const response = await fetch(`${API_URL}/api/events`);
@@ -38,3 +38,19 @@ export const getEventSeatsReport = async (token: string, eventId: string): Promi
 
     return response.json();
 };
+
+export const getConsolidatedSeatsReport = async (token: string): Promise<ConsolidatedSeatsReport[]> => {
+    const response = await fetch(`${API_URL}/api/events/consolidated-seats-report`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        throw new Error(data?.message || 'Falha ao carregar o relatório consolidado de mesas.');
+    }
+
+    return response.json();
+};
+

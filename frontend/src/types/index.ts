@@ -58,6 +58,12 @@ export interface EventSeatsReport {
     items: EventSeatsReportItem[];
 }
 
+export interface ConsolidatedSeatsReport {
+    owner_codigo_lote: string;
+    seat_name: string;
+}
+
+
 export interface AuthContextType {
     token: string | null;
     idCasa: string | null;

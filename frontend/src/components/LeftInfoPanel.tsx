@@ -46,6 +46,20 @@ export const LeftInfoPanel: React.FC = () => {
                             </button>
                         ))}
                     </div>
+                    <h3>Relatórios</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        <button
+                            onClick={() => window.open('/print-consolidated-report', '_blank')}
+                            style={{
+                                ...styles.button,
+                                border: '1px solid #ccc',
+                                backgroundColor: '#fff',
+                                color: '#333'
+                            }}
+                        >
+                            Consolidado
+                        </button>
+                    </div>
                 </div>
             )}
         </div>

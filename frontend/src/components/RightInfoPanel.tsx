@@ -63,14 +63,14 @@ export const RightInfoPanel: React.FC<RightInfoPanelProps> = ({ onBuyClick, onRo
                     style={styles.button}
                     disabled={!auth?.token || !settingsContext?.settings?.id || reportLoading}
                 >
-                    {reportLoading ? 'Carregando...' : 'Relatório de Mesas'}
+                    {reportLoading ? 'Carregando...' : `Relatório ${settingsContext?.settings?.eventName}`}
                 </button>
                 <button onClick={onLogoutClick} style={styles.logoutButton}>Trocar Casa</button>
             </div>
 
             <JsonReportModal
                 isOpen={isReportOpen}
-                title="Relatório de Mesas"
+                title="Relatório"
                 jsonData={reportData}
                 error={reportError}
                 onClose={closeReportModal}
