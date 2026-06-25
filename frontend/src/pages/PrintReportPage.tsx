@@ -27,6 +27,10 @@ export const PrintReportPage: React.FC<PrintReportPageProps> = ({ eventId }) => 
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
+        document.title = "Relatório";
+    }, []);
+
+    useEffect(() => {
         const fetchReport = async () => {
             const token = localStorage.getItem('authToken');
             if (!token) {
@@ -88,13 +92,13 @@ export const PrintReportPage: React.FC<PrintReportPageProps> = ({ eventId }) => 
                     gap: 20px;
                 }
                 .print-card {
-                    border: 2px solid #1a56b6;
+                    border: 2px solid #616161ff;
                     border-radius: 12px;
                     background-color: #fff;
                     padding: 15px;
                     display: flex;
                     justify-content: space-between;
-                    color: #1a56b6;
+                    color: #000000ff;
                     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
                 }
                 .label-small { font-size: 14px; font-weight: bold; }
@@ -137,7 +141,7 @@ export const PrintReportPage: React.FC<PrintReportPageProps> = ({ eventId }) => 
                 `}
             </style>
             
-            <h1 style={{ textAlign: 'center', color: '#1a56b6', marginBottom: '30px' }}>
+            <h1 style={{ textAlign: 'center', color: '#000000ff', marginBottom: '30px' }}>
                 {reportData.event_name || 'Evento'}
             </h1>
             

@@ -11,6 +11,9 @@ export const PrintConsolidatedReportPage: React.FC = () => {
     const [reportData, setReportData] = useState<GroupedReportItem[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
+    useEffect(() => {
+        document.title = "Relatório Consolidado";
+    }, []);
 
     useEffect(() => {
         const fetchReport = async () => {
@@ -64,15 +67,15 @@ export const PrintConsolidatedReportPage: React.FC = () => {
         fetchReport();
     }, []);
 
-    // Dispara a impressão após o carregamento e renderização com sucesso
-    useEffect(() => {
-        if (!loading && reportData.length > 0 && !error) {
-            const timer = setTimeout(() => {
-                window.print();
-            }, 500);
-            return () => clearTimeout(timer);
-        }
-    }, [loading, reportData, error]);
+    // // Dispara a impressão após o carregamento e renderização com sucesso
+    // useEffect(() => {
+    //     if (!loading && reportData.length > 0 && !error) {
+    //         const timer = setTimeout(() => {
+    //             window.print();
+    //         }, 500);
+    //         return () => clearTimeout(timer);
+    //     }
+    // }, [loading, reportData, error]);
 
     if (loading) {
         return <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>Carregando relatório para impressão...</div>;
@@ -96,13 +99,13 @@ export const PrintConsolidatedReportPage: React.FC = () => {
                     gap: 20px;
                 }
                 .print-card {
-                    border: 2px solid #1a56b6;
+                    border: 2px solid #616161ff;
                     border-radius: 12px;
                     background-color: #fff;
                     padding: 15px;
                     display: flex;
                     justify-content: space-between;
-                    color: #1a56b6;
+                    color: #000000ff;
                     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
                 }
                 .label-small { font-size: 14px; font-weight: bold; }
@@ -145,10 +148,25 @@ export const PrintConsolidatedReportPage: React.FC = () => {
                 `}
             </style>
             
-            <h1 style={{ textAlign: 'center', color: '#1a56b6', marginBottom: '30px' }}>
+            <h1 style={{ textAlign: 'center', color: '#000000ff', marginBottom: '30px' }}>
                 Relatório Consolidado
             </h1>
-            
+            <div className="no-print" style={{ textAlign: 'center', marginBottom: '40px' }}>
+                <button 
+                    onClick={() => window.print()}
+                    style={{
+                        padding: '10px 20px',
+                        fontSize: '16px',
+                        backgroundColor: '#1a56b6',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer'
+                    }}
+                >
+                    Imprimir
+                </button>
+            </div>
             <div className="card-container">
                 {reportData.map((item, index) => (
                     <div className="print-card" key={index}>
@@ -181,7 +199,7 @@ export const PrintConsolidatedReportPage: React.FC = () => {
                         cursor: 'pointer'
                     }}
                 >
-                    Imprimir Novamente
+                    Imprimir
                 </button>
             </div>
         </div>
