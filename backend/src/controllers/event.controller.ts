@@ -41,6 +41,6 @@ export const getEventSeatsReportController = async (req: Request, res: Response)
         const report = await getEventSeatsReport(idEvent);
         res.status(200).json(report);
     } catch (error: any) {
-        res.status(500).json({ message: 'Erro ao obter o relatório de assentos do evento.', error: error.message });
+        res.status(500).json({ message: 'Erro ao obter o relatório de mesas do evento.', error: error.message });
     }
 };

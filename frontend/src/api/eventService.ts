@@ -33,7 +33,7 @@ export const getEventSeatsReport = async (token: string, eventId: string): Promi
 
     if (!response.ok) {
         const data = await response.json().catch(() => null);
-        throw new Error(data?.message || 'Falha ao carregar o relatório de assentos.');
+        throw new Error(data?.message || 'Falha ao carregar o relatório de mesas.');
     }
 
     return response.json();

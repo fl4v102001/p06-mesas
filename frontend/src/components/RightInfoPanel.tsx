@@ -34,7 +34,7 @@ export const RightInfoPanel: React.FC<RightInfoPanelProps> = ({ onBuyClick, onRo
             setIsReportOpen(true);
         } catch (error: any) {
             setReportData(null);
-            setReportError(error?.message || 'Erro ao carregar relatório de assentos.');
+            setReportError(error?.message || 'Erro ao carregar relatório de mesas.');
             setIsReportOpen(true);
         } finally {
             setReportLoading(false);
@@ -43,6 +43,11 @@ export const RightInfoPanel: React.FC<RightInfoPanelProps> = ({ onBuyClick, onRo
 
     const closeReportModal = () => {
         setIsReportOpen(false);
+    };
+
+    const handlePrintClick = () => {
+        if (!settingsContext?.settings?.id) return;
+        window.open('/print-report/' + settingsContext.settings.id, '_blank');
     };
 
     return (
@@ -58,17 +63,18 @@ export const RightInfoPanel: React.FC<RightInfoPanelProps> = ({ onBuyClick, onRo
                     style={styles.button}
                     disabled={!auth?.token || !settingsContext?.settings?.id || reportLoading}
                 >
-                    {reportLoading ? 'Carregando...' : 'Relatório de Assentos'}
+                    {reportLoading ? 'Carregando...' : 'Relatório de Mesas'}
                 </button>
                 <button onClick={onLogoutClick} style={styles.logoutButton}>Trocar Casa</button>
             </div>
 
             <JsonReportModal
                 isOpen={isReportOpen}
-                title="Relatório de Assentos"
+                title="Relatório de Mesas"
                 jsonData={reportData}
                 error={reportError}
                 onClose={closeReportModal}
+                onPrint={handlePrintClick}
             />
         </div>
     );

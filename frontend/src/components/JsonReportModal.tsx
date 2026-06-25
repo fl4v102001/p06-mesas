@@ -7,6 +7,7 @@ interface JsonReportModalProps {
     jsonData: unknown;
     error?: string | null;
     onClose: () => void;
+    onPrint?: () => void;
 }
 
 interface SeatName {
@@ -25,7 +26,7 @@ interface ReportEvent {
     items: ReportItem[];
 }
 
-export const JsonReportModal: React.FC<JsonReportModalProps> = ({ isOpen, title, jsonData, error, onClose }) => {
+export const JsonReportModal: React.FC<JsonReportModalProps> = ({ isOpen, title, jsonData, error, onClose, onPrint }) => {
     if (!isOpen) return null;
 
     // A simple heuristic to check if it matches our data structure
@@ -93,6 +94,9 @@ export const JsonReportModal: React.FC<JsonReportModalProps> = ({ isOpen, title,
                     {content}
                 </div>
                 <div style={{...styles.modalActions, marginTop: '20px'}}>
+                    {onPrint && (
+                        <button style={{ ...styles.modalButton, marginRight: '10px' }} onClick={onPrint}>Imprimir</button>
+                    )}
                     <button style={{ ...styles.modalButton, ...styles.modalCancelButton }} onClick={onClose}>Fechar</button>
                 </div>
             </div>
